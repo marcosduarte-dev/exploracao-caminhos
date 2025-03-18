@@ -75,17 +75,12 @@ class UI:
                 
                 if maze.grid[y][x] == 1:  # Parede
                     pygame.draw.rect(self.screen, BLACK, (rect_x, rect_y, cell_size, cell_size))
-                else:  # Caminho
+                elif maze.grid[y][x] == 0:  # Caminho
                     pygame.draw.rect(self.screen, WHITE, (rect_x, rect_y, cell_size, cell_size))
-
-        # Desenha o ponto inicial e final
-        start_rect_x = start_x + maze.start[0] * cell_size
-        start_rect_y = start_y + maze.start[1] * cell_size
-        pygame.draw.rect(self.screen, GREEN, (start_rect_x, start_rect_y, cell_size, cell_size))
-        
-        end_rect_x = start_x + maze.end[0] * cell_size
-        end_rect_y = start_y + maze.end[1] * cell_size
-        pygame.draw.rect(self.screen, RED, (end_rect_x, end_rect_y, cell_size, cell_size))
+                elif maze.grid[y][x] == 2: # Ponto inicial
+                    pygame.draw.rect(self.screen, GREEN, (rect_x, rect_y, cell_size, cell_size))
+                elif maze.grid[y][x] == 3: # Ponto final
+                    pygame.draw.rect(self.screen, RED, (rect_x, rect_y, cell_size, cell_size))
 
         # Desenha uma grade se o zoom for suficiente
         if cell_size >= 5:

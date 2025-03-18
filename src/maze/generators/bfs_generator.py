@@ -1,5 +1,6 @@
 import random
 from collections import deque
+from utils.maze_utils import set_start_end
 
 def generate_maze(width, height):
     grid = [[1 for _ in range(width)] for _ in range(height)]
@@ -25,4 +26,6 @@ def generate_maze(width, height):
                     grid[ny][nx] = 0
                     queue.append((nx, ny))
     
+    set_start_end(width, height, grid)
+
     return grid
