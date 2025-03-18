@@ -1,4 +1,5 @@
 import random
+from utils.maze_utils import set_start_end
 
 def generate_maze(width, height):
     grid = [[1 for _ in range(width)] for _ in range(height)]
@@ -24,5 +25,7 @@ def generate_maze(width, height):
                     grid[current_y + dy//2][current_x + dx//2] = 0
                     grid[ny][nx] = 0
                     frontier.append((nx, ny))
+
+    set_start_end(width, height, grid)
     
     return grid
