@@ -81,8 +81,8 @@ class Main:
 
     def update(self):
         self.screen.fill(WHITE)
-        self.ui.draw_tabs(self.current_tab, self.sprites)
         self.ui.draw_maze(self.mazes[self.current_tab], self.current_tab, self.current_algorithm, self.zoom_level, self.offset_x, self.offset_y, self.show_visited, self.solutions, self.visited_cells, self.statistics)
+        self.ui.draw_tabs(self.current_tab, self.sprites)
         pygame.display.flip()
 
     def run(self):

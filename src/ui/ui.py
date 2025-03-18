@@ -41,7 +41,7 @@ class UI:
         start_y = center_y - total_height // 2 + offset_y
 
         # Desenha um fundo para a área do labirinto
-        pygame.draw.rect(self.screen, GRAY, (0, 45, maze_area_width, maze_area_height - 5))
+        pygame.draw.rect(self.screen, GRAY, (0, 45, maze_area_width, maze_area_height - 1))
 
         dash_length = 10  # Comprimento de cada traço
         gap_length = 5    # Espaço entre os traços
@@ -52,14 +52,14 @@ class UI:
 
         # Borda inferior
         for x in range(0, maze_area_width, dash_length + gap_length):
-            pygame.draw.line(self.screen, BLACK, (x, 45 + maze_area_height - 5), (x + dash_length, 45 + maze_area_height - 5), 2)
+            pygame.draw.line(self.screen, BLACK, (x, 45 + maze_area_height - 1), (x + dash_length, 45 + maze_area_height - 1), 2)
 
         # Borda esquerda
-        for y in range(45, 45 + maze_area_height - 5, dash_length + gap_length):
+        for y in range(45, 45 + maze_area_height - 1, dash_length + gap_length):
             pygame.draw.line(self.screen, BLACK, (0, y), (0, y + dash_length), 2)
 
         # Borda direita
-        for y in range(45, 45 + maze_area_height - 5, dash_length + gap_length):
+        for y in range(45, 45 + maze_area_height - 1, dash_length + gap_length):
             pygame.draw.line(self.screen, BLACK, (maze_area_width, y), (maze_area_width, y + dash_length), 2)
 
         # Desenha as células do labirinto
@@ -70,7 +70,7 @@ class UI:
                 
                 # Verifica se a célula está visível na tela
                 if (rect_x + cell_size < 0 or rect_x > maze_area_width or
-                    rect_y + cell_size < 0 or rect_y > maze_area_height):
+                    rect_y + cell_size < 45 or rect_y > maze_area_height + 45):
                     continue
                 
                 if maze.grid[y][x] == 1:  # Parede
@@ -117,10 +117,24 @@ class UI:
                     pygame.draw.rect(self.screen, YELLOW, (rect_x, rect_y, cell_size, cell_size))
 
         # TODO - CRIAR O PAINEL LATERAL
+        self.draw_sidebar(maze_area_width, current_algorithm, current_tab, statistics, show_visited, zoom_level)
+
+    def draw_sidebar(self, start_x, current_algorithm, current_tab, statistics, show_visited, zoom_level):
+        # Área do painel lateral
+        sidebar_rect = pygame.Rect(start_x, 45, LARGURA_TELA - start_x, ALTURA_TELA)
+        pygame.draw.rect(self.screen, GRAY, sidebar_rect)
+        pygame.draw.line(self.screen, BLACK, (start_x, 45), (start_x, ALTURA_TELA), 2)
+        
+        # Título
+        title = self.font.render("Controles", True, BLACK)
+        self.screen.blit(title, (start_x + 20, 65))
 
     def draw_tabs(self, current_tab, sprites):
         tab_width = LARGURA_TELA // MazeSize.size()
         tab_height = 40
+
+        tab_rect = pygame.Rect(0, 0, LARGURA_TELA, 45)
+        pygame.draw.rect(self.screen, WHITE, tab_rect)
         
         for i, size in enumerate(MazeSize):
             # Posição e dimensões da aba
