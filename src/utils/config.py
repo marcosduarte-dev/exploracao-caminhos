@@ -10,7 +10,7 @@ TITULO_PROJETO = "Exploração de Caminhos: Comparação entre Algoritmos de Bus
 
 # Dimensões da tela (em pixels)
 LARGURA_TELA = 1200  # Largura total da janela
-ALTURA_TELA = 800    # Altura total da janela
+ALTURA_TELA = 700    # Altura total da janela
 
 # Observações:
 # - Essas configurações podem ser ajustadas conforme necessário para diferentes telas ou resoluções.

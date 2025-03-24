@@ -13,6 +13,8 @@ def generate_mazes():
             - solutions: Estrutura para armazenar soluções de cada labirinto.
             - visited_cells: Estrutura para armazenar células visitadas durante a solução.
             - statistics: Estatísticas coletadas durante a solução dos labirintos.
+            - visited_history: Histórico de todas etapas da execução de um algoritmo.
+            - sliders: Estrutura para armazenar a geração dos sliders para visualizar etapas.
     """
     # Inicializa os labirintos para cada tamanho
     mazes = {
@@ -61,6 +63,7 @@ def is_valid_position(maze, x, y):
     Verifica se uma posição é válida no labirinto (dentro dos limites e é um caminho).
 
     Args:
+        maze (Maze): Labirinto analisado 
         x (int): Coordenada x (coluna) da célula.
         y (int): Coordenada y (linha) da célula.
 

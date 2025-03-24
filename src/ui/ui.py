@@ -45,6 +45,8 @@ class UI:
             solutions (dict): Dicionário com as soluções para cada algoritmo.
             visited_cells (dict): Dicionário com as células visitadas para cada algoritmo.
             statistics (dict): Dicionário com estatísticas de execução dos algoritmos.
+            visited_history (dict): Dicionário com todas as etapas executada pelo algoritmo.
+            sliders (dict): Dicionário com os steppers gerados para cada algoritmo.
         """
         if current_tab == MazeSize.REPORT:
             # Modo de relatório: limpa a tela e exibe o relatório
