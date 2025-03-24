@@ -7,6 +7,7 @@ from enums.algorithms import Algorithm
 from utils.maze_utils import generate_mazes
 from ui.ui import UI
 from maze.solvers.bfs_solver import solveBfs
+from ui.slider import Slider
 
 class Main:
     """
@@ -42,12 +43,15 @@ class Main:
         self.dragging = False  # Estado de arrasto do labirinto
         self.drag_start_x, self.drag_start_y = 0, 0  # Posição inicial do arrasto
         self.show_visited = True  # Mostrar células visitadas
+        self.show_solution = False # Mostrar células solução independente da step
+        self.step_slider = None
+        self.start_x = LARGURA_TELA - 400
 
         # Estado do jogo
         self.running = True
 
         # Gera os labirintos iniciais e estruturas relacionadas
-        self.mazes, self.solutions, self.visited_cells, self.statistics = generate_mazes()
+        self.mazes, self.solutions, self.visited_cells, self.statistics, self.visited_history, self.sliders = generate_mazes()
 
     def _load_sprites(self):
         """
@@ -75,6 +79,28 @@ class Main:
                     self.dragging = False
             elif event.type == pygame.MOUSEMOTION:
                 self._handle_mouse_motion(event)
+            if (hasattr(self, 'sliders') and 
+                self.current_tab in self.sliders and 
+                self.current_algorithm in self.sliders[self.current_tab]):
+                
+                slider = self.sliders[self.current_tab][self.current_algorithm]
+                slider.handle_event(event)
+                
+                '''# Opcional: eventos para os botões de navegação
+                if event.type == pygame.MOUSEBUTTONDOWN:
+                    mouse_pos = pygame.mouse.get_pos()
+                    
+                    # Botão anterior
+                    prev_rect = pygame.Rect(self.start_x + 20, 250, 30, 30)
+                    if prev_rect.collidepoint(mouse_pos):
+                        slider.value = max(0, slider.value - 1)
+                        slider.update_knob_position()
+                    
+                    # Botão próximo
+                    next_rect = pygame.Rect(self.start_x + 400 - 50, 250, 30, 30)
+                    if next_rect.collidepoint(mouse_pos):
+                        slider.value = min(slider.max_val, slider.value + 1)
+                        slider.update_knob_position()'''
 
     def _handle_mouse_button_down(self, event):
         """
@@ -96,7 +122,7 @@ class Main:
                 if rect.collidepoint(event.pos):
                     if algorithm == Algorithm.BFS:
                         self.current_algorithm = Algorithm.BFS
-                        path, visited, time_taken = solveBfs(self.mazes[self.current_tab])  # Seu solver BFS
+                        path, visited, history, time_taken = solveBfs(self.mazes[self.current_tab])  # Seu solver BFS
                     if algorithm == Algorithm.DFS:
                         # Implementar DFS
                         path = []
@@ -110,6 +136,18 @@ class Main:
                         "time_taken": time_taken,
                         "path_length": len(path)
                     }
+                    self.visited_history[self.current_tab][self.current_algorithm] = history
+                    if history and self.show_visited:
+                        if not hasattr(self, 'sliders'):
+                            self.sliders = {
+                                MazeSize.SMALL: {},
+                                MazeSize.MEDIUM: {},
+                                MazeSize.LARGE: {}
+                            }
+                        self.sliders[self.current_tab][self.current_algorithm] = Slider(
+                            self.start_x + 25, ALTURA_TELA - 30, 400 - 40, 10, 
+                            0, len(history) - 1, 0
+                        )
                     print("Quantidade visitada: " + str(len(visited)))
                     print("Tempo levado: " + str(time_taken) + " ms" )
                     print("Tamanho do caminho: " + str(len(path)))
@@ -145,8 +183,9 @@ class Main:
         # Desenha o labirinto e as abas
         self.ui.draw_maze(
             self.mazes[self.current_tab], self.current_tab, self.current_algorithm,
-            self.zoom_level, self.offset_x, self.offset_y, self.show_visited,
-            self.solutions, self.visited_cells, self.statistics
+            self.zoom_level, self.offset_x, self.offset_y, self.show_visited, 
+            self.show_solution, self.solutions, self.visited_cells, self.statistics,
+            self.visited_history, self.sliders
         )
         self.ui.draw_tabs(self.current_tab, self.sprites)
         self.ui.draw_algorithm_buttons(self.current_algorithm, self.sprites)

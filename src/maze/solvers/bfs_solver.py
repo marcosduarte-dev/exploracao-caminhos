@@ -25,6 +25,7 @@ def solveBfs(maze):
     
     # Conjunto para armazenar posições já visitadas (evita revisitar)
     visited = {maze.start}
+    visited_history = [set(visited)]  # Histórico de células visitadas
     
     # Loop principal da BFS
     while queue:
@@ -33,7 +34,7 @@ def solveBfs(maze):
         
         # Verifica se chegou ao destino
         if (x, y) == maze.end:
-            return path, visited  # Retorna solução encontrada
+            return path, visited, visited_history  # Retorna solução encontrada
             
         # Explora os 4 vizinhos (direita, baixo, esquerda, cima)
         for dx, dy in [(0, 1), (1, 0), (0, -1), (-1, 0)]:
@@ -45,6 +46,7 @@ def solveBfs(maze):
                 queue.append(((nx, ny), path + [(nx, ny)]))
                 # Marca como visitada
                 visited.add((nx, ny))
+                visited_history.append(set(visited))
     
     # Se a fila esvaziar sem encontrar solução
-    return [], visited  # Retorna caminho vazio
+    return [], visited, visited_history   # Retorna caminho vazio
