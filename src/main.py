@@ -6,6 +6,7 @@ from enums.maze_size import MazeSize
 from enums.algorithms import Algorithm
 from utils.maze_utils import generate_mazes
 from ui.ui import UI
+from maze.solvers.bfs_solver import solveBfs
 
 class Main:
     """
@@ -34,13 +35,13 @@ class Main:
         # Inicialização de componentes
         self.ui = UI(self.font_path, self.screen)
         self.current_tab = MazeSize.SMALL  # Tamanho inicial do labirinto
-        self.current_algorithm = Algorithm.BFS  # Algoritmo inicial
+        self.current_algorithm = None  # Algoritmo inicial
         self.sprites = self._load_sprites()  # Carrega sprites das abas
         self.zoom_level = 1.0  # Nível de zoom inicial
         self.offset_x, self.offset_y = 0, 0  # Deslocamento do labirinto
         self.dragging = False  # Estado de arrasto do labirinto
         self.drag_start_x, self.drag_start_y = 0, 0  # Posição inicial do arrasto
-        self.show_visited = False  # Mostrar células visitadas
+        self.show_visited = True  # Mostrar células visitadas
 
         # Estado do jogo
         self.running = True
@@ -86,9 +87,32 @@ class Main:
             # Verifica se o clique foi em uma aba
             for size, rect in self.ui.tabs.items():
                 if rect.collidepoint(event.pos):
-                    self.current_tab = size
+                    if(self.current_tab != size):
+                        self.current_tab = size
+                        self.current_algorithm = None
                     break
-
+            # Verifica se o clique foi em um algoritmo
+            for algorithm, rect in self.ui.algorithm_buttons.items():
+                if rect.collidepoint(event.pos):
+                    if algorithm == Algorithm.BFS:
+                        self.current_algorithm = Algorithm.BFS
+                        path, visited, time_taken = solveBfs(self.mazes[self.current_tab])  # Seu solver BFS
+                    if algorithm == Algorithm.DFS:
+                        # Implementar DFS
+                        path = []
+                        visited = []
+                        time_taken = []
+                        print("DFS")
+                    self.solutions[self.current_tab][self.current_algorithm] = path
+                    self.visited_cells[self.current_tab][self.current_algorithm] = visited
+                    self.statistics[self.current_tab][self.current_algorithm] = {
+                        "visited_count": len(visited),
+                        "time_taken": time_taken,
+                        "path_length": len(path)
+                    }
+                    print("Quantidade visitada: " + str(len(visited)))
+                    print("Tempo levado: " + str(time_taken) + " ms" )
+                    print("Tamanho do caminho: " + str(len(path)))
             # Inicia o arrasto do labirinto
             if event.pos[0] < 800:  # Dentro da área do labirinto
                 self.dragging = True
@@ -125,6 +149,7 @@ class Main:
             self.solutions, self.visited_cells, self.statistics
         )
         self.ui.draw_tabs(self.current_tab, self.sprites)
+        self.ui.draw_algorithm_buttons(self.current_algorithm, self.sprites)
 
         pygame.display.flip()  # Atualiza a tela
 
