@@ -2,6 +2,7 @@ import pygame
 from utils.config import *
 from enums.colour import *
 from enums.maze_size import MazeSize
+from enums.algorithms import Algorithm
 
 class UI:
     """
@@ -26,6 +27,7 @@ class UI:
         self.font = pygame.font.Font(font_path, 20)  # Fonte principal
         self.small_font = pygame.font.Font(font_path, 16)  # Fonte secundária
         self.tabs = {}  # Armazena os retângulos das abas
+        self.algorithm_buttons = {} # Armazena os restângulos dos algoritmos
 
     def draw_maze(self, maze, current_tab, current_algorithm, zoom_level, offset_x, offset_y, show_visited, solutions, visited_cells, statistics):
         """
@@ -79,10 +81,6 @@ class UI:
         # Desenha as células do labirinto
         self._draw_maze_cells(maze, cell_size, start_x, start_y, maze_area_width, maze_area_height)
 
-        # Desenha a grade se o zoom for suficiente
-        if cell_size >= 5:
-            self._draw_grid(maze, cell_size, start_x, start_y)
-
         # Desenha células visitadas, se a opção estiver ativada
         if show_visited and current_algorithm in visited_cells[current_tab]:
             self._draw_visited_cells(visited_cells[current_tab][current_algorithm], maze, cell_size, start_x, start_y)
@@ -90,6 +88,10 @@ class UI:
         # Desenha a solução, se disponível
         if current_algorithm in solutions[current_tab]:
             self._draw_solution(solutions[current_tab][current_algorithm], maze, cell_size, start_x, start_y)
+
+        # Desenha a grade se o zoom for suficiente
+        if cell_size >= 5:
+            self._draw_grid(maze, cell_size, start_x, start_y)
 
         # Desenha o painel lateral
         self.draw_sidebar(maze_area_width, current_algorithm, current_tab, statistics, show_visited, zoom_level)
@@ -222,7 +224,8 @@ class UI:
             zoom_level (float): Nível de zoom aplicado ao labirinto.
         """
         # Área do painel lateral
-        sidebar_rect = pygame.Rect(start_x, 45, LARGURA_TELA - start_x, ALTURA_TELA)
+        sidebar_width = LARGURA_TELA - start_x;
+        sidebar_rect = pygame.Rect(start_x, 45,sidebar_width, ALTURA_TELA)
         pygame.draw.rect(self.screen, GRAY, sidebar_rect)
         pygame.draw.line(self.screen, BLACK, (start_x, 45), (start_x, ALTURA_TELA), 2)
 
@@ -267,3 +270,38 @@ class UI:
 
             # Armazena o retângulo para detecção de clique
             self.tabs[size] = tab_btn
+
+    def draw_algorithm_buttons(self, current_algorithm, sprites):
+        """
+        Desenha os botões de seleção de algoritmo.
+
+        Args:
+            current_algorithm (Algorithm): Algoritmo atual (botão selecionado).
+            sprites (dict): Dicionário com sprites dos botões.
+        """
+        button_width = 250
+        button_height = 40
+        button_x = LARGURA_TELA - 380  # Posição X à esquerda da tela
+
+        for i, algorithm in enumerate(Algorithm):
+            # Posição e dimensões do botão
+            button = pygame.Rect(button_x, (i * button_height) + 100, button_width, button_height - 10)
+
+            # Sprite do botão
+            if algorithm == current_algorithm:
+                sprite = sprites['sprite_current_tab']
+            else:
+                sprite = sprites['sprite_normal_tab']
+
+            scaled_sprite = pygame.transform.scale(sprite, (button.width, button.height))
+            self.screen.blit(scaled_sprite, button)
+
+            # Texto do botão
+            text = self.small_font.render(f"{algorithm.name}", True, BLACK)
+            text_rect = text.get_rect(center=(button.centerx, button.centery))
+            self.screen.blit(text, text_rect)
+
+            # Armazena o retângulo para detecção de clique
+            self.algorithm_buttons[algorithm] = button
+
+        return self.algorithm_buttons

@@ -20,3 +20,10 @@ class Algorithm(Enum):
         Retorna uma representação legível do algoritmo.
         """
         return f"{self.name} ({self.value}) - {self.__doc__}"
+    
+    @classmethod
+    def size(cls):
+        """
+        Retorna o número total de tamanhos disponíveis no enum.
+        """
+        return len(cls)

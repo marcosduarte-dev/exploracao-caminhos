@@ -1,5 +1,7 @@
 from enums.maze_size import MazeSize
 from maze.maze import Maze
+from functools import wraps
+import time
 
 def generate_mazes():
     """
@@ -42,7 +44,7 @@ def generate_mazes():
     return mazes, solutions, visited_cells, statistics
 
 
-def is_valid_position(self, x, y):
+def is_valid_position(maze, x, y):
     """
     Verifica se uma posição é válida no labirinto (dentro dos limites e é um caminho).
 
@@ -53,7 +55,7 @@ def is_valid_position(self, x, y):
     Returns:
         bool: True se a posição é válida, False caso contrário.
     """
-    return 0 <= x < self.width and 0 <= y < self.height and self.grid[y][x] == 0
+    return 0 <= x < maze.width and 0 <= y < maze.height and maze.grid[y][x] != 1
 
 
 def set_start_end(width, height, grid):
@@ -124,3 +126,33 @@ def _find_end_position(width, height, grid):
     if width > 1 and height > 1:
         grid[height - 1][width - 2] = 0  # Abre uma célula adjacente
     return (width - 1, height - 1)
+
+
+class Benchmark:
+    """
+    Classe utilitária para medição de tempo de execução.
+    """
+    @staticmethod
+    def measure(func):
+        """
+        Decorador que mede o tempo de execução em milissegundos.
+        
+        Args:
+            func (callable): Função a ser decorada
+            
+        Returns:
+            tuple: Resultado original da função + tempo em ms (como último elemento)
+        """
+        @wraps(func)
+        def timed(*args, **kwargs):
+            start = time.perf_counter_ns()
+            result = func(*args, **kwargs)
+            end = time.perf_counter_ns()
+            
+            elapsed_ms = (end - start) / 1_000_000  # Converte para milissegundos
+            
+            if isinstance(result, tuple):
+                return (*result, elapsed_ms)
+            return (result, elapsed_ms)
+            
+        return timed
