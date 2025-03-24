@@ -29,7 +29,8 @@ class UI:
         self.tabs = {}  # Armazena os retângulos das abas
         self.algorithm_buttons = {} # Armazena os restângulos dos algoritmos
 
-    def draw_maze(self, maze, current_tab, current_algorithm, zoom_level, offset_x, offset_y, show_visited, solutions, visited_cells, statistics):
+    def draw_maze(self, maze, current_tab, current_algorithm, zoom_level, offset_x, offset_y, show_visited, show_solution,
+        solutions, visited_cells, statistics, visited_history, sliders):
         """
         Desenha o labirinto na tela.
 
@@ -83,18 +84,32 @@ class UI:
 
         # Desenha células visitadas, se a opção estiver ativada
         if show_visited and current_algorithm in visited_cells[current_tab]:
-            self._draw_visited_cells(visited_cells[current_tab][current_algorithm], maze, cell_size, start_x, start_y)
+            # Verifica se temos histórico e slider para esse algoritmo e aba
+            if (current_algorithm in visited_history[current_tab] and 
+                current_algorithm in sliders[current_tab]):
+                
+                history = visited_history[current_tab][current_algorithm]
+                step = sliders[current_tab][current_algorithm].value
+                self._draw_visited_cells(history, maze, cell_size, start_x, start_y, step)
+            else:
+                self._draw_visited_cells(
+                    visited_cells[current_tab][current_algorithm], 
+                    maze, cell_size, start_x, start_y
+                )
 
         # Desenha a solução, se disponível
-        if current_algorithm in solutions[current_tab]:
-            self._draw_solution(solutions[current_tab][current_algorithm], maze, cell_size, start_x, start_y)
+        if ((current_algorithm in solutions[current_tab] and 
+        (not show_visited or sliders[current_tab][current_algorithm].value == len(history) - 1))
+            or show_solution):
+            if(current_algorithm != None):
+                self._draw_solution(solutions[current_tab][current_algorithm], maze, cell_size, start_x, start_y)
 
         # Desenha a grade se o zoom for suficiente
         if cell_size >= 5:
             self._draw_grid(maze, cell_size, start_x, start_y)
 
         # Desenha o painel lateral
-        self.draw_sidebar(maze_area_width, current_algorithm, current_tab, statistics, show_visited, zoom_level)
+        self.draw_sidebar(maze_area_width, current_algorithm, current_tab, statistics, show_visited, zoom_level, visited_history, sliders)
 
     def _draw_maze_background(self, maze_area_width, maze_area_height):
         """
@@ -177,18 +192,24 @@ class UI:
                             (start_x + x * cell_size, start_y),
                             (start_x + x * cell_size, start_y + maze.height * cell_size), 1)
 
-    def _draw_visited_cells(self, visited, maze, cell_size, start_x, start_y):
+    def _draw_visited_cells(self, visited, maze, cell_size, start_x, start_y, step=None):
         """
-        Desenha as células visitadas.
+        Desenha as células visitadas, opcionalmente limitando ao passo especificado pelo slider.
 
         Args:
-            visited (list): Lista de células visitadas.
+            visited (list ou list[set]): Lista de células visitadas ou histórico de visitas.
             maze (Maze): Objeto do labirinto.
             cell_size (int): Tamanho de cada célula.
             start_x (int): Posição inicial X do labirinto.
             start_y (int): Posição inicial Y do labirinto.
+            step (int, opcional): Passo específico a ser mostrado, para uso com o slider.
         """
-        for pos in visited:
+        # Determina quais células desenhar com base no passo do slider
+        cells_to_draw = visited
+        if isinstance(visited, list) and step is not None and step < len(visited):
+            cells_to_draw = visited[step]
+        
+        for pos in cells_to_draw:
             if pos != maze.start and pos != maze.end:  # Não sobrescreve início e fim
                 rect_x = start_x + pos[0] * cell_size
                 rect_y = start_y + pos[1] * cell_size
@@ -211,7 +232,7 @@ class UI:
                 rect_y = start_y + pos[1] * cell_size
                 pygame.draw.rect(self.screen, YELLOW, (rect_x, rect_y, cell_size, cell_size))
 
-    def draw_sidebar(self, start_x, current_algorithm, current_tab, statistics, show_visited, zoom_level):
+    def draw_sidebar(self, start_x, current_algorithm, current_tab, statistics, show_visited, zoom_level, visited_history, sliders, step_slider=None, step_count=0):
         """
         Desenha o painel lateral com controles e informações.
 
@@ -233,8 +254,31 @@ class UI:
         title = self.font.render("Controles", True, BLACK)
         self.screen.blit(title, (start_x + 20, 65))
 
-        # TODO BOTOES
-        # TODO ESTATISTICAS
+        if (current_tab in sliders and 
+            current_algorithm in sliders[current_tab]):
+
+            slider = sliders[current_tab][current_algorithm]
+            history = visited_history[current_tab][current_algorithm]
+            
+            # Renderiza texto do passo atual
+            steps_text = self.font.render(f"Passo: {slider.value + 1}/{slider.max_val + 1}", True, BLACK)
+            self.screen.blit(steps_text, (start_x + 20, ALTURA_TELA - 68)) # ALTURA, SE SOBREESCREVER
+            
+            # Desenha o slider
+            slider.draw(self.screen)
+            
+            # Adiciona botões de navegação para passos (opcional)
+            '''prev_rect = pygame.Rect(start_x + 20, 250, 30, 30)
+            next_rect = pygame.Rect(start_x + sidebar_width - 50, 250, 30, 30)
+            
+            pygame.draw.rect(self.screen, (200, 200, 200), prev_rect)
+            pygame.draw.rect(self.screen, (200, 200, 200), next_rect)
+            
+            prev_text = self.font.render("<", True, BLACK)
+            next_text = self.font.render(">", True, BLACK)
+            
+            self.screen.blit(prev_text, (prev_rect.centerx - 5, prev_rect.centery - 8))
+            self.screen.blit(next_text, (next_rect.centerx - 5, next_rect.centery - 8))'''
 
     def draw_tabs(self, current_tab, sprites):
         """

@@ -41,7 +41,19 @@ def generate_mazes():
         MazeSize.LARGE: {}
     }
 
-    return mazes, solutions, visited_cells, statistics
+    visited_history = {
+        MazeSize.SMALL: {},
+        MazeSize.MEDIUM: {},
+        MazeSize.LARGE: {}
+    }
+
+    sliders = {
+        MazeSize.SMALL: {},
+        MazeSize.MEDIUM: {},
+        MazeSize.LARGE: {}
+    }
+
+    return mazes, solutions, visited_cells, statistics, visited_history, sliders
 
 
 def is_valid_position(maze, x, y):
