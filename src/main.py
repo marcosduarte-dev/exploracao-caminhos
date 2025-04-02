@@ -7,6 +7,7 @@ from enums.algorithms import Algorithm
 from utils.maze_utils import generate_mazes
 from ui.ui import UI
 from maze.solvers.bfs_solver import solveBfs
+from maze.solvers.AStartManhattan_solver import solveAstarManhattan
 from ui.slider import Slider
 
 class Main:
@@ -129,6 +130,9 @@ class Main:
                         visited = []
                         time_taken = []
                         print("DFS")
+                    if algorithm == Algorithm.ASTAR_MANHATTAN:
+                        self.current_algorithm = Algorithm.ASTAR_MANHATTAN
+                        path, visited, history, time_taken = solveAstarManhattan(self.mazes[self.current_tab])
                     self.solutions[self.current_tab][self.current_algorithm] = path
                     self.visited_cells[self.current_tab][self.current_algorithm] = visited
                     self.statistics[self.current_tab][self.current_algorithm] = {
