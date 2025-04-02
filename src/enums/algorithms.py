@@ -9,8 +9,12 @@ class Algorithm(Enum):
 
     BFS = 0  # Breadth-First Search: Algoritmo de busca em largura, utilizado para explorar nós em grafos ou árvores nível por nível.
     DFS = 1  # Depth-First Search: Algoritmo de busca em profundidade, que explora o máximo possível ao longo de cada ramo antes de retroceder.
-    ASTAR = 2  # A* (A Estrela): Algoritmo de busca que utiliza heurísticas para encontrar o caminho mais curto entre dois pontos.
-    DIJKSTRA = 3  # Dijkstra: Algoritmo de busca que encontra o caminho mais curto entre dois nós em um grafo com pesos não negativos.
+    DIJKSTRA = 2  # Dijkstra: Algoritmo de busca que encontra o caminho mais curto entre dois nós em um grafo com pesos não negativos.
+    JOHNSON = 3
+    FLOYD_WARSHALL = 4
+    ASTAR_MANHATTAN = 5  # A* (A Estrela): Algoritmo de busca que utiliza heurísticas para encontrar o caminho mais curto entre dois pontos.
+    ASTAR_EUCLIDIANA = 6 # A* (A Estrela): Algoritmo de busca que utiliza heurísticas para encontrar o caminho mais curto entre dois pontos.
+    ACO = 7
 
     # Exemplo de como adicionar um novo algoritmo:
     # NOVO_ALGORITMO = 4  # Descrição breve do novo algoritmo.
@@ -27,3 +31,9 @@ class Algorithm(Enum):
         Retorna o número total de tamanhos disponíveis no enum.
         """
         return len(cls)
+    
+    @property
+    def display_name(self):
+        name = self.name.replace("_", " ")
+        name = name.replace("ASTAR", "A*")
+        return name

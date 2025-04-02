@@ -343,7 +343,7 @@ class UI:
             self.screen.blit(scaled_sprite, button)
 
             # Texto do botão
-            text = self.small_font.render(f"{algorithm.name}", True, BLACK)
+            text = self.small_font.render(f"{algorithm.display_name}", True, BLACK)
             text_rect = text.get_rect(center=(button.centerx, button.centery))
             self.screen.blit(text, text_rect)
 
