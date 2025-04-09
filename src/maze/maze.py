@@ -27,9 +27,9 @@ class Maze:
         self.width = width
         self.height = height
         self.generator = generator
-        self.grid = [[1 for _ in range(width)] for _ in range(height)]  # Inicializa o labirinto com paredes (1)
-        self.start = (0, 0)  # Posição inicial padrão
-        self.end = (width - 1, height - 1)  # Posição final padrão
+        self.grid = [[1 for _ in range(width)] for _ in range(height)]
+        self.start = (0, 0) 
+        self.end = (width - 1, height - 1)
         self.generate()  # Gera o labirinto
 
     def generate(self):

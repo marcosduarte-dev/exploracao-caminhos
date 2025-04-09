@@ -16,6 +16,7 @@ def solveBfs(maze):
         tuple: Contendo três elementos:
             - list: Caminho da solução como lista de coordenadas [(x1,y1), (x2,y2), ...]
             - set: Todas as células visitadas durante a busca
+            - set: Histórico do momento que visitou as células
     """
     
     # Inicializa a fila para BFS com:
