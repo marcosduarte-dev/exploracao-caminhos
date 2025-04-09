@@ -310,7 +310,7 @@ class UI:
             self.screen.blit(scaled_sprite, tab_btn)
 
             # Texto da aba
-            text = self.font.render(f"{size.name}", True, BLACK)
+            text = self.font.render(f"{size.display_name}", True, BLACK)
             text_rect = text.get_rect(center=(tab_btn.centerx, tab_btn.centery))
             self.screen.blit(text, text_rect)
 

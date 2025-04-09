@@ -148,9 +148,9 @@ class Main:
                             self.start_x + 25, ALTURA_TELA - 30, 400 - 40, 10, 
                             0, len(history) - 1, 0
                         )
-                    print("Quantidade visitada: " + str(len(visited)))
-                    print("Tempo levado: " + str(time_taken) + " ms" )
-                    print("Tamanho do caminho: " + str(len(path)))
+                    #print("Quantidade visitada: " + str(len(visited)))
+                    #print("Tempo levado: " + str(time_taken) + " ms" )
+                    #print("Tamanho do caminho: " + str(len(path)))
             # Inicia o arrasto do labirinto
             if event.pos[0] < 800:  # Dentro da área do labirinto
                 self.dragging = True

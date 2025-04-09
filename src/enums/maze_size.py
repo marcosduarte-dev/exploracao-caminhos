@@ -38,3 +38,15 @@ class MazeSize(Enum):
         if self == MazeSize.REPORT:
             return f"{self.name} - Modo de relatório"
         return f"{self.name} - {self.get_dimensions()[0]}x{self.get_dimensions()[1]}"
+    
+    @property
+    def display_name(self):
+        name = self.name
+        if(self.name == "SMALL"):
+            name = self.name.replace("SMALL", "10x10")
+        if(self.name == "MEDIUM"):
+            name = self.name.replace("MEDIUM", "50x50")
+        if(self.name == "LARGE"):
+            name = self.name.replace("LARGE", "100x100")
+        
+        return name
