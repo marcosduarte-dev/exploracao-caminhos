@@ -291,7 +291,7 @@ class UI:
             scaled_sprite = pygame.transform.scale(sprite, (tab_btn.width, tab_btn.height))
             self.screen.blit(scaled_sprite, tab_btn)
 
-            text = self.font.render(f"{size.name}", True, BLACK)
+            text = self.font.render(f"{size.display_name}", True, BLACK)
             text_rect = text.get_rect(center=(tab_btn.centerx, tab_btn.centery))
             self.screen.blit(text, text_rect)
 
