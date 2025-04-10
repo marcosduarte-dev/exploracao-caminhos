@@ -103,17 +103,15 @@ def _find_start_position(width, height, grid):
     Returns:
         tuple: Posição de início no formato (x, y).
     """
-    # Procura um ponto inicial próximo ao canto superior esquerdo
     for y in range(min(3, height)):
         for x in range(min(3, width)):
             if grid[y][x] == 0:
-                grid[y][x] = 2  # Marca como início
+                grid[y][x] = 2
                 return (x, y)
 
-    # Se não encontrou um ponto inicial válido, força uma abertura
-    grid[0][0] = 2  # Marca como início
+    grid[0][0] = 2
     if width > 1:
-        grid[0][1] = 0  # Abre uma célula adjacente
+        grid[0][1] = 0
     return (0, 0)
 
 
@@ -129,17 +127,15 @@ def _find_end_position(width, height, grid):
     Returns:
         tuple: Posição de fim no formato (x, y).
     """
-    # Procura um ponto final próximo ao canto inferior direito
     for y in range(height - 1, max(height - 4, 0), -1):
         for x in range(width - 1, max(width - 4, 0), -1):
             if grid[y][x] == 0:
-                grid[y][x] = 3  # Marca como fim
+                grid[y][x] = 3
                 return (x, y)
 
-    # Se não encontrou um ponto final válido, força uma abertura
-    grid[height - 1][width - 1] = 3  # Marca como fim
+    grid[height - 1][width - 1] = 3
     if width > 1 and height > 1:
-        grid[height - 1][width - 2] = 0  # Abre uma célula adjacente
+        grid[height - 1][width - 2] = 0
     return (width - 1, height - 1)
 
 

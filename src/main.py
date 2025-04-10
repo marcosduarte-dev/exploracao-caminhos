@@ -7,12 +7,10 @@ from enums.algorithms import Algorithm
 from utils.maze_utils import generate_mazes
 from ui.ui import UI
 from maze.solvers.bfs_solver import solveBfs
+from maze.solvers.AStartManhattan_solver import solveAstarManhattan
 from ui.slider import Slider
 
 class Main:
-    """
-    Classe principal que gerencia o loop do jogo e a interação com o usuário.
-    """
 
     def __init__(self):
         """
@@ -35,22 +33,20 @@ class Main:
 
         # Inicialização de componentes
         self.ui = UI(self.font_path, self.screen)
-        self.current_tab = MazeSize.SMALL  # Tamanho inicial do labirinto
-        self.current_algorithm = None  # Algoritmo inicial
-        self.sprites = self._load_sprites()  # Carrega sprites das abas
-        self.zoom_level = 1.0  # Nível de zoom inicial
-        self.offset_x, self.offset_y = 0, 0  # Deslocamento do labirinto
-        self.dragging = False  # Estado de arrasto do labirinto
-        self.drag_start_x, self.drag_start_y = 0, 0  # Posição inicial do arrasto
+        self.current_tab = MazeSize.SMALL
+        self.current_algorithm = None
+        self.sprites = self._load_sprites()
+        self.zoom_level = 1.0
+        self.offset_x, self.offset_y = 0, 0
+        self.dragging = False
+        self.drag_start_x, self.drag_start_y = 0, 0 
         self.show_visited = True  # Mostrar células visitadas
         self.show_solution = False # Mostrar células solução independente da step
         self.step_slider = None
         self.start_x = LARGURA_TELA - 400
 
-        # Estado do jogo
         self.running = True
 
-        # Gera os labirintos iniciais e estruturas relacionadas
         self.mazes, self.solutions, self.visited_cells, self.statistics, self.visited_history, self.sliders = generate_mazes()
 
     def _load_sprites(self):
@@ -85,30 +81,9 @@ class Main:
                 
                 slider = self.sliders[self.current_tab][self.current_algorithm]
                 slider.handle_event(event)
-                
-                '''# Opcional: eventos para os botões de navegação
-                if event.type == pygame.MOUSEBUTTONDOWN:
-                    mouse_pos = pygame.mouse.get_pos()
-                    
-                    # Botão anterior
-                    prev_rect = pygame.Rect(self.start_x + 20, 250, 30, 30)
-                    if prev_rect.collidepoint(mouse_pos):
-                        slider.value = max(0, slider.value - 1)
-                        slider.update_knob_position()
-                    
-                    # Botão próximo
-                    next_rect = pygame.Rect(self.start_x + 400 - 50, 250, 30, 30)
-                    if next_rect.collidepoint(mouse_pos):
-                        slider.value = min(slider.max_val, slider.value + 1)
-                        slider.update_knob_position()'''
 
     def _handle_mouse_button_down(self, event):
-        """
-        Processa cliques do mouse.
-
-        Args:
-            event (pygame.event.Event): Evento de clique do mouse.
-        """
+        """Processa cliques do mouse."""
         if event.button == 1:  # Clique esquerdo
             # Verifica se o clique foi em uma aba
             for size, rect in self.ui.tabs.items():
@@ -122,13 +97,17 @@ class Main:
                 if rect.collidepoint(event.pos):
                     if algorithm == Algorithm.BFS:
                         self.current_algorithm = Algorithm.BFS
-                        path, visited, history, time_taken = solveBfs(self.mazes[self.current_tab])  # Seu solver BFS
+                        path, visited, history, time_taken = solveBfs(self.mazes[self.current_tab])
                     if algorithm == Algorithm.DFS:
                         # Implementar DFS
                         path = []
                         visited = []
                         time_taken = []
                         print("DFS")
+                    if algorithm == Algorithm.ASTAR_MANHATTAN:
+                        self.current_algorithm = Algorithm.ASTAR_MANHATTAN
+                        path, visited, history, time_taken = solveAstarManhattan(self.mazes[self.current_tab])
+                    
                     self.solutions[self.current_tab][self.current_algorithm] = path
                     self.visited_cells[self.current_tab][self.current_algorithm] = visited
                     self.statistics[self.current_tab][self.current_algorithm] = {
@@ -148,11 +127,10 @@ class Main:
                             self.start_x + 25, ALTURA_TELA - 30, 400 - 40, 10, 
                             0, len(history) - 1, 0
                         )
-                    #print("Quantidade visitada: " + str(len(visited)))
-                    #print("Tempo levado: " + str(time_taken) + " ms" )
-                    #print("Tamanho do caminho: " + str(len(path)))
-            # Inicia o arrasto do labirinto
-            if event.pos[0] < 800:  # Dentro da área do labirinto
+                    print("Quantidade visitada: " + str(len(visited)))
+                    print("Tempo levado: " + str(time_taken) + " ms" )
+                    print("Tamanho do caminho: " + str(len(path)))
+            if event.pos[0] < 800:
                 self.dragging = True
                 self.drag_start_x, self.drag_start_y = event.pos
 
@@ -164,12 +142,8 @@ class Main:
     def _handle_mouse_motion(self, event):
         """
         Processa o movimento do mouse durante o arrasto.
-
-        Args:
-            event (pygame.event.Event): Evento de movimento do mouse.
         """
         if self.dragging:
-            # Atualiza o deslocamento com base no movimento do mouse
             self.offset_x += event.pos[0] - self.drag_start_x
             self.offset_y += event.pos[1] - self.drag_start_y
             self.drag_start_x, self.drag_start_y = event.pos
@@ -190,18 +164,18 @@ class Main:
         self.ui.draw_tabs(self.current_tab, self.sprites)
         self.ui.draw_algorithm_buttons(self.current_algorithm, self.sprites)
 
-        pygame.display.flip()  # Atualiza a tela
+        pygame.display.flip()
 
     def run(self):
         """
         Executa o loop principal do jogo.
         """
         while self.running:
-            self.handle_events()  # Processa eventos
-            self.update()  # Atualiza a tela
-            self.clock.tick(60)  # Limita a 60 FPS
+            self.handle_events()
+            self.update()
+            self.clock.tick(60)
 
-        pygame.quit()  # Encerra o pygame ao sair do loop
+        pygame.quit()
 
 
 if __name__ == "__main__":
