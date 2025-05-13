@@ -11,6 +11,8 @@ from maze.solvers.AStartManhattan_solver import solveAstarManhattan
 from maze.solvers.dijkstra_solver import solveDijkstra
 from maze.solvers.johnson_solver import solveJohnson
 from maze.solvers.floydWarshall_solver import solveFloydWarshall
+from maze.solvers.greedy_bfs_solver import solveGreedyBFS
+from maze.solvers.bidirectional_search_solver import solveBidirectionalSearch
 from ui.slider import Slider
 
 class Main:
@@ -136,6 +138,24 @@ class Main:
                         self.current_algorithm = Algorithm.ASTAR_MANHATTAN
                         if(self.solutions.get(self.current_tab) == {} or self.solutions[self.current_tab].get(self.current_algorithm) is None):
                             path, visited, history, time_taken = solveAstarManhattan(self.mazes[self.current_tab])
+                        else:
+                            path = self.solutions[self.current_tab][self.current_algorithm]
+                            visited = self.visited_cells[self.current_tab][self.current_algorithm]
+                            history = self.visited_history[self.current_tab][self.current_algorithm]
+                            time_taken = self.statistics[self.current_tab][self.current_algorithm]["time_taken"]
+                    if algorithm == Algorithm.GREEDY_BFS:
+                        self.current_algorithm = Algorithm.GREEDY_BFS
+                        if(self.solutions.get(self.current_tab) == {} or self.solutions[self.current_tab].get(self.current_algorithm) is None):
+                            path, visited, history, time_taken = solveGreedyBFS(self.mazes[self.current_tab])
+                        else:
+                            path = self.solutions[self.current_tab][self.current_algorithm]
+                            visited = self.visited_cells[self.current_tab][self.current_algorithm]
+                            history = self.visited_history[self.current_tab][self.current_algorithm]
+                            time_taken = self.statistics[self.current_tab][self.current_algorithm]["time_taken"]
+                    if algorithm == Algorithm.BIDIRECTIONAL_SEARCH:
+                        self.current_algorithm = Algorithm.BIDIRECTIONAL_SEARCH
+                        if(self.solutions.get(self.current_tab) == {} or self.solutions[self.current_tab].get(self.current_algorithm) is None):
+                            path, visited, history, time_taken = solveBidirectionalSearch(self.mazes[self.current_tab])
                         else:
                             path = self.solutions[self.current_tab][self.current_algorithm]
                             visited = self.visited_cells[self.current_tab][self.current_algorithm]
