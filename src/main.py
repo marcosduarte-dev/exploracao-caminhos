@@ -8,6 +8,8 @@ from utils.maze_utils import generate_mazes
 from ui.ui import UI
 from maze.solvers.bfs_solver import solveBfs
 from maze.solvers.AStartManhattan_solver import solveAstarManhattan
+from maze.solvers.greedy_bfs_solver import solveGreedyBFS
+from maze.solvers.bidirectional_search_solver import solveBidirectionalSearch
 from ui.slider import Slider
 
 class Main:
@@ -107,6 +109,12 @@ class Main:
                     if algorithm == Algorithm.ASTAR_MANHATTAN:
                         self.current_algorithm = Algorithm.ASTAR_MANHATTAN
                         path, visited, history, time_taken = solveAstarManhattan(self.mazes[self.current_tab])
+                    if algorithm == Algorithm.GREEDY_BFS:
+                        self.current_algorithm = Algorithm.GREEDY_BFS
+                        path, visited, history, time_taken = solveGreedyBFS(self.mazes[self.current_tab])
+                    if algorithm == Algorithm.BIDIRECTIONAL_SEARCH:
+                        self.current_algorithm = Algorithm.BIDIRECTIONAL_SEARCH
+                        path, visited, history, time_taken = solveBidirectionalSearch(self.mazes[self.current_tab])
                     
                     self.solutions[self.current_tab][self.current_algorithm] = path
                     self.visited_cells[self.current_tab][self.current_algorithm] = visited
