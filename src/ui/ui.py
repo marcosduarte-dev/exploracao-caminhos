@@ -28,6 +28,7 @@ class UI:
         self.small_font = pygame.font.Font(font_path, 16)
         self.tabs = {}
         self.algorithm_buttons = {}
+        self.font_path = font_path
 
     def draw_maze(self, maze, current_tab, current_algorithm, zoom_level, offset_x, offset_y, show_visited, show_solution,
         solutions, visited_cells, statistics, visited_history, sliders):
@@ -245,10 +246,11 @@ class UI:
 
             slider = sliders[current_tab][current_algorithm]
             history = visited_history[current_tab][current_algorithm]
-            
+
             steps_text = self.font.render(f"Passo: {slider.value + 1}/{slider.max_val + 1}", True, BLACK)
             self.screen.blit(steps_text, (start_x + 20, ALTURA_TELA - 68))
-            
+
+
             slider.draw(self.screen)
             
             # Adiciona botões de navegação para passos (opcional)
@@ -325,3 +327,37 @@ class UI:
             self.algorithm_buttons[algorithm] = button
 
         return self.algorithm_buttons
+    
+    def draw_generate_button(self, screen, start_x, start_y, width=150, height=40):
+        self.generate_button_rect = pygame.Rect(start_x, start_y, width, height)
+        pygame.draw.rect(screen, (100, 200, 100), self.generate_button_rect, border_radius=10)
+
+        font = pygame.font.Font(self.font_path, 20)
+        text = font.render("Novo Labirinto", True, (255, 255, 255))
+        text_rect = text.get_rect(center=self.generate_button_rect.center)
+        screen.blit(text, text_rect)
+    
+    def draw_statistics(self, screen, stats, x, y):
+        """
+        Desenha as estatísticas do algoritmo na tela.
+
+        Args:
+            screen (pygame.Surface): Tela onde desenhar.
+            stats (dict): Dicionário com 'visited_count', 'time_taken', 'path_length'.
+            x (int): Posição X do canto superior esquerdo.
+            y (int): Posição Y do canto superior esquerdo.
+        """
+        if not stats:
+            return
+
+        font = pygame.font.Font(self.font_path, 18)
+        color = (0, 0, 0)  # preto
+
+        visited_text = font.render(f"Células visitadas: {stats['visited_count']}", True, color)
+        time_text = font.render(f"Tempo: {stats['time_taken']:.2f} ms", True, color)
+        path_text = font.render(f"Tamanho do caminho: {stats['path_length']}", True, color)
+
+        screen.blit(visited_text, (x, y))
+        screen.blit(time_text, (x, y + 25))
+        screen.blit(path_text, (x, y + 50))
+

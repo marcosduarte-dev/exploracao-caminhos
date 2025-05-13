@@ -8,6 +8,9 @@ from utils.maze_utils import generate_mazes
 from ui.ui import UI
 from maze.solvers.bfs_solver import solveBfs
 from maze.solvers.AStartManhattan_solver import solveAstarManhattan
+from maze.solvers.dijkstra_solver import solveDijkstra
+from maze.solvers.johnson_solver import solveJohnson
+from maze.solvers.floydWarshall_solver import solveFloydWarshall
 from ui.slider import Slider
 
 class Main:
@@ -104,6 +107,15 @@ class Main:
                         visited = []
                         time_taken = []
                         print("DFS")
+                    if algorithm == Algorithm.DIJKSTRA:
+                        self.current_algorithm = Algorithm.DIJKSTRA
+                        path, visited, history, time_taken = solveDijkstra(self.mazes[self.current_tab])
+                    if algorithm == Algorithm.JOHNSON:
+                        self.current_algorithm = Algorithm.JOHNSON
+                        path, visited, history, time_taken = solveJohnson(self.mazes[self.current_tab])
+                    if algorithm == Algorithm.FLOYD_WARSHALL:
+                        self.current_algorithm = Algorithm.FLOYD_WARSHALL
+                        path, visited, history, time_taken = solveFloydWarshall(self.mazes[self.current_tab])
                     if algorithm == Algorithm.ASTAR_MANHATTAN:
                         self.current_algorithm = Algorithm.ASTAR_MANHATTAN
                         path, visited, history, time_taken = solveAstarManhattan(self.mazes[self.current_tab])
@@ -130,6 +142,14 @@ class Main:
                     print("Quantidade visitada: " + str(len(visited)))
                     print("Tempo levado: " + str(time_taken) + " ms" )
                     print("Tamanho do caminho: " + str(len(path)))
+
+                    self.statistics[self.current_tab][self.current_algorithm]
+
+                if hasattr(self.ui, 'generate_button_rect') and self.ui.generate_button_rect.collidepoint(event.pos):
+                    print("Gerando novo labirinto...")
+                    self.mazes, self.solutions, self.visited_cells, self.statistics, self.visited_history, self.sliders = generate_mazes()
+                    self.current_algorithm = None  # limpa seleção anterior
+
             if event.pos[0] < 800:
                 self.dragging = True
                 self.drag_start_x, self.drag_start_y = event.pos
@@ -163,6 +183,16 @@ class Main:
         )
         self.ui.draw_tabs(self.current_tab, self.sprites)
         self.ui.draw_algorithm_buttons(self.current_algorithm, self.sprites)
+        #self.ui.draw_generate_button(self.screen, 20, 20)
+        button_width = 160  # ou o valor usado no seu botão
+        x = self.start_x + (650 - button_width) // 2
+        self.ui.draw_generate_button(self.screen, x, 50)  # Y = 40, por exemplo
+
+        # Desenhar estatísticas (abaixo dos controles)
+        stats = self.statistics[self.current_tab].get(self.current_algorithm)
+        if stats:
+           self.ui.draw_statistics(self.screen, stats, self.start_x + 20, 450)
+
 
         pygame.display.flip()
 
