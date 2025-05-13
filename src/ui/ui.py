@@ -29,6 +29,16 @@ class UI:
         self.tabs = {}
         self.algorithm_buttons = {}
         self.font_path = font_path
+        
+        # Cores modernas e claras
+        self.primary_color = (255, 255, 255)  # Branco
+        self.secondary_color = (240, 240, 240)  # Cinza muito claro
+        self.accent_color = (41, 176, 233)  # Verde claro
+        self.text_color = (70, 70, 70)  # Cinza escuro suave
+        self.button_color = (230, 230, 230)  # Cinza claro para botões
+        self.button_hover_color = (220, 220, 220)  # Cinza um pouco mais escuro para hover
+        self.sidebar_color = (245, 245, 245)  # Cinza muito claro para sidebar
+        self.border_color = (200, 200, 200)  # Cinza claro para bordas
 
     def draw_maze(self, maze, current_tab, current_algorithm, zoom_level, offset_x, offset_y, show_visited, show_solution,
         solutions, visited_cells, statistics, visited_history, sliders):
@@ -222,49 +232,30 @@ class UI:
                 pygame.draw.rect(self.screen, YELLOW, (rect_x, rect_y, cell_size, cell_size))
 
     def draw_sidebar(self, start_x, current_algorithm, current_tab, statistics, show_visited, zoom_level, visited_history, sliders, step_slider=None, step_count=0):
-        """
-        Desenha o painel lateral com controles e informações.
-
-        Args:
-            start_x (int): Posição X inicial do painel.
-            current_algorithm (str): Algoritmo atual selecionado.
-            current_tab (MazeSize): Tamanho do labirinto atual (aba selecionada).
-            statistics (dict): Dicionário com estatísticas de execução dos algoritmos.
-            show_visited (bool): Se True, mostra as células visitadas.
-            zoom_level (float): Nível de zoom aplicado ao labirinto.
-        """
-        sidebar_width = LARGURA_TELA - start_x;
-        sidebar_rect = pygame.Rect(start_x, 45,sidebar_width, ALTURA_TELA)
-        pygame.draw.rect(self.screen, GRAY, sidebar_rect)
-        pygame.draw.line(self.screen, BLACK, (start_x, 45), (start_x, ALTURA_TELA), 2)
-
-        title = self.font.render("Controles", True, BLACK)
+        """Desenha o painel lateral com estilo moderno"""
+        sidebar_width = LARGURA_TELA - start_x
+        sidebar_rect = pygame.Rect(start_x, 45, sidebar_width, ALTURA_TELA)
+        
+        # Fundo do sidebar
+        pygame.draw.rect(self.screen, self.sidebar_color, sidebar_rect)
+        
+        # Linha separadora suave
+        pygame.draw.line(self.screen, self.border_color, (start_x, 45), (start_x, ALTURA_TELA), 2)
+        
+        # Título
+        title = self.font.render("Controles", True, self.text_color)
         self.screen.blit(title, (start_x + 20, 65))
 
         if (current_tab in sliders and 
             current_algorithm in sliders[current_tab]):
-
+            
             slider = sliders[current_tab][current_algorithm]
             history = visited_history[current_tab][current_algorithm]
-
-            steps_text = self.font.render(f"Passo: {slider.value + 1}/{slider.max_val + 1}", True, BLACK)
+            
+            steps_text = self.font.render(f"Passo: {slider.value + 1}/{slider.max_val + 1}", True, self.text_color)
             self.screen.blit(steps_text, (start_x + 20, ALTURA_TELA - 68))
-
-
+            
             slider.draw(self.screen)
-            
-            # Adiciona botões de navegação para passos (opcional)
-            '''prev_rect = pygame.Rect(start_x + 20, 250, 30, 30)
-            next_rect = pygame.Rect(start_x + sidebar_width - 50, 250, 30, 30)
-            
-            pygame.draw.rect(self.screen, (200, 200, 200), prev_rect)
-            pygame.draw.rect(self.screen, (200, 200, 200), next_rect)
-            
-            prev_text = self.font.render("<", True, BLACK)
-            next_text = self.font.render(">", True, BLACK)
-            
-            self.screen.blit(prev_text, (prev_rect.centerx - 5, prev_rect.centery - 8))
-            self.screen.blit(next_text, (next_rect.centerx - 5, next_rect.centery - 8))'''
 
     def draw_tabs(self, current_tab, sprites):
         """
@@ -298,64 +289,76 @@ class UI:
             self.tabs[size] = tab_btn
 
     def draw_algorithm_buttons(self, current_algorithm, sprites):
-        """
-        Desenha os botões de seleção de algoritmo.
-
-        Args:
-            current_algorithm (Algorithm): Algoritmo atual (botão selecionado).
-            sprites (dict): Dicionário com sprites dos botões.
-        """
+        """Desenha os botões de algoritmo com estilo moderno"""
         button_width = 250
         button_height = 40
         button_x = LARGURA_TELA - 380
-
+        
         for i, algorithm in enumerate(Algorithm):
             button = pygame.Rect(button_x, (i * button_height) + 100, button_width, button_height - 10)
-
+            
+            # Verifica hover
+            mouse_pos = pygame.mouse.get_pos()
+            is_hovered = button.collidepoint(mouse_pos)
+            
+            # Cores baseadas no estado
             if algorithm == current_algorithm:
-                sprite = sprites['sprite_current_tab']
+                color = self.accent_color
+            elif is_hovered:
+                color = self.button_hover_color
             else:
-                sprite = sprites['sprite_normal_tab']
-
-            scaled_sprite = pygame.transform.scale(sprite, (button.width, button.height))
-            self.screen.blit(scaled_sprite, button)
-
-            text = self.small_font.render(f"{algorithm.display_name}", True, BLACK)
+                color = self.button_color
+            
+            # Desenha o botão com bordas arredondadas
+            pygame.draw.rect(self.screen, color, button, border_radius=10)
+            pygame.draw.rect(self.screen, self.border_color, button, 1, border_radius=10)  # Borda suave
+            
+            # Texto do botão
+            text = self.small_font.render(f"{algorithm.display_name}", True, self.text_color)
             text_rect = text.get_rect(center=(button.centerx, button.centery))
             self.screen.blit(text, text_rect)
-
+            
             self.algorithm_buttons[algorithm] = button
-
+        
         return self.algorithm_buttons
-    
-    def draw_generate_button(self, screen, start_x, start_y, width=150, height=40):
-        self.generate_button_rect = pygame.Rect(start_x, start_y, width, height)
-        pygame.draw.rect(screen, (100, 200, 100), self.generate_button_rect, border_radius=10)
 
+    def draw_generate_button(self, screen, start_x, start_y, width=150, height=40):
+        """Desenha o botão de geração com estilo moderno"""
+        self.generate_button_rect = pygame.Rect(start_x, start_y, width, height)
+        
+        # Verifica hover
+        mouse_pos = pygame.mouse.get_pos()
+        is_hovered = self.generate_button_rect.collidepoint(mouse_pos)
+        
+        # Cores baseadas no estado
+        button_color = self.accent_color if not is_hovered else self.button_hover_color
+        
+        # Desenha o botão
+        pygame.draw.rect(screen, button_color, self.generate_button_rect, border_radius=10)
+        pygame.draw.rect(screen, self.border_color, self.generate_button_rect, 1, border_radius=10)  # Borda suave
+        
+        # Texto do botão
         font = pygame.font.Font(self.font_path, 20)
-        text = font.render("Novo Labirinto", True, (255, 255, 255))
+        text = font.render("Novo Labirinto", True, self.text_color)
         text_rect = text.get_rect(center=self.generate_button_rect.center)
         screen.blit(text, text_rect)
-    
-    def draw_statistics(self, screen, stats, x, y):
-        """
-        Desenha as estatísticas do algoritmo na tela.
 
-        Args:
-            screen (pygame.Surface): Tela onde desenhar.
-            stats (dict): Dicionário com 'visited_count', 'time_taken', 'path_length'.
-            x (int): Posição X do canto superior esquerdo.
-            y (int): Posição Y do canto superior esquerdo.
-        """
+    def draw_statistics(self, screen, stats, x, y):
+        """Desenha as estatísticas com estilo moderno"""
         if not stats:
             return
 
-        font = pygame.font.Font(self.font_path, 18)
-        color = (0, 0, 0)  # preto
+        # Container para estatísticas
+        stats_rect = pygame.Rect(x - 10, y - 10, 300, 100)
+        pygame.draw.rect(screen, self.primary_color, stats_rect, border_radius=10)
+        pygame.draw.rect(screen, self.border_color, stats_rect, 1, border_radius=10)  # Borda suave
 
-        visited_text = font.render(f"Células visitadas: {stats['visited_count']}", True, color)
-        time_text = font.render(f"Tempo: {stats['time_taken']:.2f} ms", True, color)
-        path_text = font.render(f"Tamanho do caminho: {stats['path_length']}", True, color)
+        font = pygame.font.Font(self.font_path, 18)
+        
+        # Estatísticas com marcadores
+        visited_text = font.render(f"• Células visitadas: {stats['visited_count']}", True, self.text_color)
+        time_text = font.render(f"• Tempo: {stats['time_taken']:.2f} ms", True, self.text_color)
+        path_text = font.render(f"• Tamanho do caminho: {stats['path_length']}", True, self.text_color)
 
         screen.blit(visited_text, (x, y))
         screen.blit(time_text, (x, y + 25))

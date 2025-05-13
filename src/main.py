@@ -146,7 +146,6 @@ class Main:
                     self.statistics[self.current_tab][self.current_algorithm]
 
                 if hasattr(self.ui, 'generate_button_rect') and self.ui.generate_button_rect.collidepoint(event.pos):
-                    print("Gerando novo labirinto...")
                     self.mazes, self.solutions, self.visited_cells, self.statistics, self.visited_history, self.sliders = generate_mazes()
                     self.current_algorithm = None  # limpa seleção anterior
 
