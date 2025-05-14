@@ -322,8 +322,9 @@ class UI:
         
         return self.algorithm_buttons
 
-    def draw_generate_button(self, screen, start_x, start_y, width=150, height=40):
-        """Desenha o botão de geração com estilo moderno"""
+    def draw_generate_button(self, screen, start_x, start_y, width=50, height=50):
+        """Desenha o botão de geração como um círculo com ícone de mais"""
+        # Cria um botão circular
         self.generate_button_rect = pygame.Rect(start_x, start_y, width, height)
         
         # Verifica hover
@@ -333,15 +334,29 @@ class UI:
         # Cores baseadas no estado
         button_color = self.accent_color if not is_hovered else self.button_hover_color
         
-        # Desenha o botão
-        pygame.draw.rect(screen, button_color, self.generate_button_rect, border_radius=10)
-        pygame.draw.rect(screen, self.border_color, self.generate_button_rect, 1, border_radius=10)  # Borda suave
+        # Desenha o círculo
+        pygame.draw.circle(screen, button_color, 
+                         (start_x + width//2, start_y + height//2), 
+                         width//2)
+        pygame.draw.circle(screen, self.border_color, 
+                         (start_x + width//2, start_y + height//2), 
+                         width//2, 1)  # Borda suave
         
-        # Texto do botão
-        font = pygame.font.Font(self.font_path, 20)
-        text = font.render("Novo Labirinto", True, self.text_color)
-        text_rect = text.get_rect(center=self.generate_button_rect.center)
-        screen.blit(text, text_rect)
+        # Desenha o ícone de mais
+        plus_size = width // 3
+        plus_thickness = 3
+        
+        # Linha horizontal do plus
+        pygame.draw.line(screen, self.text_color,
+                        (start_x + width//2 - plus_size//2, start_y + height//2),
+                        (start_x + width//2 + plus_size//2, start_y + height//2),
+                        plus_thickness)
+        
+        # Linha vertical do plus
+        pygame.draw.line(screen, self.text_color,
+                        (start_x + width//2, start_y + height//2 - plus_size//2),
+                        (start_x + width//2, start_y + height//2 + plus_size//2),
+                        plus_thickness)
 
     def draw_statistics(self, screen, stats, x, y):
         """Desenha as estatísticas com estilo moderno"""
