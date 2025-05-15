@@ -98,27 +98,49 @@ class Main:
             # Verifica se o clique foi em um algoritmo
             for algorithm, rect in self.ui.algorithm_buttons.items():
                 if rect.collidepoint(event.pos):
+                    path = []
+                    visited = []
+                    history = []
+                    time_taken = 0
                     if algorithm == Algorithm.BFS:
                         self.current_algorithm = Algorithm.BFS
-                        path, visited, history, time_taken = solveBfs(self.mazes[self.current_tab])
-                    if algorithm == Algorithm.DFS:
-                        # Implementar DFS
-                        path = []
-                        visited = []
-                        time_taken = []
-                        print("DFS")
+                        if(self.solutions.get(self.current_tab) == {} or self.solutions[self.current_tab].get(self.current_algorithm) is None):
+                            path, visited, history, time_taken = solveBfs(self.mazes[self.current_tab])
+                        else:
+                            path = self.solutions[self.current_tab][self.current_algorithm]
+                            visited = self.visited_cells[self.current_tab][self.current_algorithm]
+                            history = self.visited_history[self.current_tab][self.current_algorithm]
+                            time_taken = self.statistics[self.current_tab][self.current_algorithm]["time_taken"]
+                    # if algorithm == Algorithm.DFS:
+                    #     # Implementar DFS
+                    #     path = []
+                    #     visited = []
+                    #     time_taken = []
+                    #     print("DFS")
                     if algorithm == Algorithm.DIJKSTRA:
                         self.current_algorithm = Algorithm.DIJKSTRA
-                        path, visited, history, time_taken = solveDijkstra(self.mazes[self.current_tab])
-                    if algorithm == Algorithm.JOHNSON:
-                        self.current_algorithm = Algorithm.JOHNSON
-                        path, visited, history, time_taken = solveJohnson(self.mazes[self.current_tab])
-                    if algorithm == Algorithm.FLOYD_WARSHALL:
-                        self.current_algorithm = Algorithm.FLOYD_WARSHALL
-                        path, visited, history, time_taken = solveFloydWarshall(self.mazes[self.current_tab])
+                        if(self.solutions.get(self.current_tab) == {} or self.solutions[self.current_tab].get(self.current_algorithm) is None):
+                            path, visited, history, time_taken = solveDijkstra(self.mazes[self.current_tab])
+                        else:
+                            path = self.solutions[self.current_tab][self.current_algorithm]
+                            visited = self.visited_cells[self.current_tab][self.current_algorithm]
+                            history = self.visited_history[self.current_tab][self.current_algorithm]
+                            time_taken = self.statistics[self.current_tab][self.current_algorithm]["time_taken"]
+                    # if algorithm == Algorithm.JOHNSON:
+                    #     self.current_algorithm = Algorithm.JOHNSON
+                    #     path, visited, history, time_taken = solveJohnson(self.mazes[self.current_tab])
+                    # if algorithm == Algorithm.FLOYD_WARSHALL:
+                    #     self.current_algorithm = Algorithm.FLOYD_WARSHALL
+                    #     path, visited, history, time_taken = solveFloydWarshall(self.mazes[self.current_tab])
                     if algorithm == Algorithm.ASTAR_MANHATTAN:
                         self.current_algorithm = Algorithm.ASTAR_MANHATTAN
-                        path, visited, history, time_taken = solveAstarManhattan(self.mazes[self.current_tab])
+                        if(self.solutions.get(self.current_tab) == {} or self.solutions[self.current_tab].get(self.current_algorithm) is None):
+                            path, visited, history, time_taken = solveAstarManhattan(self.mazes[self.current_tab])
+                        else:
+                            path = self.solutions[self.current_tab][self.current_algorithm]
+                            visited = self.visited_cells[self.current_tab][self.current_algorithm]
+                            history = self.visited_history[self.current_tab][self.current_algorithm]
+                            time_taken = self.statistics[self.current_tab][self.current_algorithm]["time_taken"]
                     
                     self.solutions[self.current_tab][self.current_algorithm] = path
                     self.visited_cells[self.current_tab][self.current_algorithm] = visited

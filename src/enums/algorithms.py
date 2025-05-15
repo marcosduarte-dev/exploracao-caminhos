@@ -8,13 +8,13 @@ class Algorithm(Enum):
     """
 
     BFS = 0
-    DFS = 1
+    #DFS = 1
     DIJKSTRA = 2
-    JOHNSON = 3
-    FLOYD_WARSHALL = 4
+    #JOHNSON = 3
+    #FLOYD_WARSHALL = 4
     ASTAR_MANHATTAN = 5  
-    ASTAR_EUCLIDIANA = 6
-    ACO = 7
+    #ASTAR_EUCLIDIANA = 6
+    #ACO = 7
 
     def __str__(self):
         """
