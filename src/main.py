@@ -141,15 +141,15 @@ class Main:
                             visited = self.visited_cells[self.current_tab][self.current_algorithm]
                             history = self.visited_history[self.current_tab][self.current_algorithm]
                             time_taken = self.statistics[self.current_tab][self.current_algorithm]["time_taken"]
-                    if algorithm == Algorithm.GREEDY_BFS:
-                        self.current_algorithm = Algorithm.GREEDY_BFS
-                        if(self.solutions.get(self.current_tab) == {} or self.solutions[self.current_tab].get(self.current_algorithm) is None):
-                            path, visited, history, time_taken = solveGreedyBFS(self.mazes[self.current_tab])
-                        else:
-                            path = self.solutions[self.current_tab][self.current_algorithm]
-                            visited = self.visited_cells[self.current_tab][self.current_algorithm]
-                            history = self.visited_history[self.current_tab][self.current_algorithm]
-                            time_taken = self.statistics[self.current_tab][self.current_algorithm]["time_taken"]
+                    # if algorithm == Algorithm.GREEDY_BFS:
+                    #     self.current_algorithm = Algorithm.GREEDY_BFS
+                    #     if(self.solutions.get(self.current_tab) == {} or self.solutions[self.current_tab].get(self.current_algorithm) is None):
+                    #         path, visited, history, time_taken = solveGreedyBFS(self.mazes[self.current_tab])
+                    #     else:
+                    #         path = self.solutions[self.current_tab][self.current_algorithm]
+                    #         visited = self.visited_cells[self.current_tab][self.current_algorithm]
+                    #         history = self.visited_history[self.current_tab][self.current_algorithm]
+                    #         time_taken = self.statistics[self.current_tab][self.current_algorithm]["time_taken"]
                     if algorithm == Algorithm.BIDIRECTIONAL_SEARCH:
                         self.current_algorithm = Algorithm.BIDIRECTIONAL_SEARCH
                         if(self.solutions.get(self.current_tab) == {} or self.solutions[self.current_tab].get(self.current_algorithm) is None):

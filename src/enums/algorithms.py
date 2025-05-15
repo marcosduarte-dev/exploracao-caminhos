@@ -10,7 +10,7 @@ class Algorithm(Enum):
     BFS = 0
     #DFS = 1
     DIJKSTRA = 2
-    GREEDY_BFS = 3
+    #GREEDY_BFS = 3
     #JOHNSON = 3
     #FLOYD_WARSHALL = 4
     BIDIRECTIONAL_SEARCH = 4
