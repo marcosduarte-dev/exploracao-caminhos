@@ -10,6 +10,7 @@ from maze.solvers.bfs_solver import solveBfs
 from maze.solvers.AStartManhattan_solver import solveAstarManhattan
 from maze.solvers.greedy_bfs_solver import solveGreedyBFS
 from maze.solvers.bidirectional_search_solver import solveBidirectionalSearch
+from maze.solvers.dijkstra_solver import solveDijkstra
 from ui.slider import Slider
 
 class Main:
