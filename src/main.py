@@ -8,9 +8,6 @@ from utils.maze_utils import generate_mazes
 from ui.ui import UI
 from maze.solvers.bfs_solver import solveBfs
 from maze.solvers.AStartManhattan_solver import solveAstarManhattan
-from maze.solvers.dijkstra_solver import solveDijkstra
-from maze.solvers.johnson_solver import solveJohnson
-from maze.solvers.floydWarshall_solver import solveFloydWarshall
 from maze.solvers.greedy_bfs_solver import solveGreedyBFS
 from maze.solvers.bidirectional_search_solver import solveBidirectionalSearch
 from ui.slider import Slider
