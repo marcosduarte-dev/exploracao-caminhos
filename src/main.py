@@ -10,6 +10,7 @@ from maze.solvers.bfs_solver import solveBfs
 from maze.solvers.AStartManhattan_solver import solveAstarManhattan
 from maze.solvers.greedy_bfs_solver import solveGreedyBFS
 from maze.solvers.bidirectional_search_solver import solveBidirectionalSearch
+from maze.solvers.bidirectional_astar_solver import solveBidirectionalAstar
 from maze.solvers.dijkstra_solver import solveDijkstra
 from ui.slider import Slider
 
@@ -117,15 +118,15 @@ class Main:
                     #     visited = []
                     #     time_taken = []
                     #     print("DFS")
-                    if algorithm == Algorithm.DIJKSTRA:
-                        self.current_algorithm = Algorithm.DIJKSTRA
-                        if(self.solutions.get(self.current_tab) == {} or self.solutions[self.current_tab].get(self.current_algorithm) is None):
-                            path, visited, history, time_taken = solveDijkstra(self.mazes[self.current_tab])
-                        else:
-                            path = self.solutions[self.current_tab][self.current_algorithm]
-                            visited = self.visited_cells[self.current_tab][self.current_algorithm]
-                            history = self.visited_history[self.current_tab][self.current_algorithm]
-                            time_taken = self.statistics[self.current_tab][self.current_algorithm]["time_taken"]
+                    # if algorithm == Algorithm.DIJKSTRA:
+                    #     self.current_algorithm = Algorithm.DIJKSTRA
+                    #     if(self.solutions.get(self.current_tab) == {} or self.solutions[self.current_tab].get(self.current_algorithm) is None):
+                    #         path, visited, history, time_taken = solveDijkstra(self.mazes[self.current_tab])
+                    #     else:
+                    #         path = self.solutions[self.current_tab][self.current_algorithm]
+                    #         visited = self.visited_cells[self.current_tab][self.current_algorithm]
+                    #         history = self.visited_history[self.current_tab][self.current_algorithm]
+                    #         time_taken = self.statistics[self.current_tab][self.current_algorithm]["time_taken"]
                     # if algorithm == Algorithm.JOHNSON:
                     #     self.current_algorithm = Algorithm.JOHNSON
                     #     path, visited, history, time_taken = solveJohnson(self.mazes[self.current_tab])
@@ -154,6 +155,16 @@ class Main:
                         self.current_algorithm = Algorithm.BIDIRECTIONAL_SEARCH
                         if(self.solutions.get(self.current_tab) == {} or self.solutions[self.current_tab].get(self.current_algorithm) is None):
                             path, visited, history, time_taken = solveBidirectionalSearch(self.mazes[self.current_tab])
+                        else:
+                            path = self.solutions[self.current_tab][self.current_algorithm]
+                            visited = self.visited_cells[self.current_tab][self.current_algorithm]
+                            history = self.visited_history[self.current_tab][self.current_algorithm]
+                            time_taken = self.statistics[self.current_tab][self.current_algorithm]["time_taken"]
+                    
+                    if algorithm == Algorithm.BIDIRECTIONAL_ASTAR:
+                        self.current_algorithm = Algorithm.BIDIRECTIONAL_ASTAR
+                        if(self.solutions.get(self.current_tab) == {} or self.solutions[self.current_tab].get(self.current_algorithm) is None):
+                            path, visited, history, time_taken = solveBidirectionalAstar(self.mazes[self.current_tab])
                         else:
                             path = self.solutions[self.current_tab][self.current_algorithm]
                             visited = self.visited_cells[self.current_tab][self.current_algorithm]
