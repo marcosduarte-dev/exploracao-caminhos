@@ -45,9 +45,9 @@ class Main:
         self.dragging = False
         self.drag_start_x, self.drag_start_y = 0, 0 
         self.show_visited = True  # Mostrar células visitadas
-        self.show_solution = False # Mostrar células solução independente da step
         self.step_slider = None
         self.start_x = LARGURA_TELA - 400
+        self.ui.show_slider = False  # Estado inicial do slider (desabilitado)
 
         self.running = True
 
@@ -89,6 +89,11 @@ class Main:
     def _handle_mouse_button_down(self, event):
         """Processa cliques do mouse."""
         if event.button == 1:  # Clique esquerdo
+            # Verifica se o clique foi no botão toggle
+            if hasattr(self.ui, 'toggle_button_rect') and self.ui.toggle_button_rect.collidepoint(event.pos):
+                self.ui.show_slider = not self.ui.show_slider
+                return
+
             # Verifica se o clique foi em uma aba
             for size, rect in self.ui.tabs.items():
                 if rect.collidepoint(event.pos):
@@ -228,21 +233,23 @@ class Main:
         self.ui.draw_maze(
             self.mazes[self.current_tab], self.current_tab, self.current_algorithm,
             self.zoom_level, self.offset_x, self.offset_y, self.show_visited, 
-            self.show_solution, self.solutions, self.visited_cells, self.statistics,
+            self.solutions, self.visited_cells, self.statistics,
             self.visited_history, self.sliders
         )
         self.ui.draw_tabs(self.current_tab, self.sprites)
         self.ui.draw_algorithm_buttons(self.current_algorithm, self.sprites)
-        #self.ui.draw_generate_button(self.screen, 20, 20)
         button_width = 50  # Tamanho do botão circular
         x = self.start_x + (650 - button_width) // 2
         self.ui.draw_generate_button(self.screen, x, 50)  # Y = 50, por exemplo
+
+        # Desenha o check no botão toggle
+        if hasattr(self.ui, 'toggle_button_rect'):
+            self.ui.draw_toggle_check(self.screen, self.ui.toggle_button_rect, self.ui.show_slider)
 
         # Desenhar estatísticas (abaixo dos controles)
         stats = self.statistics[self.current_tab].get(self.current_algorithm)
         if stats:
            self.ui.draw_statistics(self.screen, stats, self.start_x + 20, 450)
-
 
         pygame.display.flip()
 
