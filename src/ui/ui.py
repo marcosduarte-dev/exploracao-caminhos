@@ -39,8 +39,9 @@ class UI:
         self.button_hover_color = (220, 220, 220)  # Cinza um pouco mais escuro para hover
         self.sidebar_color = (245, 245, 245)  # Cinza muito claro para sidebar
         self.border_color = (200, 200, 200)  # Cinza claro para bordas
+        self.show_solution = False
 
-    def draw_maze(self, maze, current_tab, current_algorithm, zoom_level, offset_x, offset_y, show_visited, show_solution,
+    def draw_maze(self, maze, current_tab, current_algorithm, zoom_level, offset_x, offset_y, show_visited,
         solutions, visited_cells, statistics, visited_history, sliders):
         """
         Desenha o labirinto na tela.
@@ -89,7 +90,7 @@ class UI:
 
         self._draw_maze_cells(maze, cell_size, start_x, start_y, maze_area_width, maze_area_height)
 
-        if show_visited and current_algorithm in visited_cells[current_tab]:
+        if show_visited and current_algorithm in visited_cells[current_tab] and not self.show_solution:
             if (current_algorithm in visited_history[current_tab] and 
                 current_algorithm in sliders[current_tab]):
                 
@@ -102,11 +103,16 @@ class UI:
                     maze, cell_size, start_x, start_y
                 )
 
-        if ((current_algorithm in solutions[current_tab] and 
-        (not show_visited or sliders[current_tab][current_algorithm].value == len(history) - 1))
-            or show_solution):
+        if (self.show_solution or (current_algorithm in solutions[current_tab] and 
+        (not show_visited or sliders[current_tab][current_algorithm].value == len(history) - 1))):
             if(current_algorithm != None):
+                if(self.show_solution):
+                    self._draw_visited_cells(
+                    visited_cells[current_tab][current_algorithm], 
+                    maze, cell_size, start_x, start_y
+                )
                 self._draw_solution(solutions[current_tab][current_algorithm], maze, cell_size, start_x, start_y)
+                
 
         if cell_size >= 5:
             self._draw_grid(maze, cell_size, start_x, start_y)
@@ -246,9 +252,20 @@ class UI:
         title = self.font.render("Controles", True, self.text_color)
         self.screen.blit(title, (start_x + 20, 65))
 
+        # Toggle button para o slider
+        toggle_text = self.small_font.render("Mostrar Passo a Passo", True, self.text_color)
+        self.screen.blit(toggle_text, (start_x + 20, ALTURA_TELA - 100))
+        
+        # Desenha o botão toggle
+        self.toggle_button_rect = pygame.Rect(start_x + 200, ALTURA_TELA - 100, 20, 20)
+        pygame.draw.rect(self.screen, self.button_color, self.toggle_button_rect, border_radius=4)
+        pygame.draw.rect(self.screen, self.border_color, self.toggle_button_rect, 1, border_radius=4)
+
         if (current_tab in sliders and 
-            current_algorithm in sliders[current_tab]):
+            current_algorithm in sliders[current_tab] and
+            hasattr(self, 'show_slider') and self.show_slider):
             
+            self.show_solution = False;
             slider = sliders[current_tab][current_algorithm]
             history = visited_history[current_tab][current_algorithm]
             
@@ -256,6 +273,19 @@ class UI:
             self.screen.blit(steps_text, (start_x + 20, ALTURA_TELA - 68))
             
             slider.draw(self.screen)
+        else:
+            self.show_solution = True;
+
+    def draw_toggle_check(self, surface, rect, checked):
+        """Desenha o check mark no botão toggle"""
+        if checked:
+            # Desenha um X simples
+            pygame.draw.line(surface, self.accent_color, 
+                           (rect.left + 5, rect.top + 5),
+                           (rect.right - 5, rect.bottom - 5), 2)
+            pygame.draw.line(surface, self.accent_color,
+                           (rect.left + 5, rect.bottom - 5),
+                           (rect.right - 5, rect.top + 5), 2)
 
     def draw_tabs(self, current_tab, sprites):
         """
