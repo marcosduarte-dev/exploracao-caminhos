@@ -50,7 +50,7 @@ def solveBidirectionalAstar(maze):
         backward_path.append(maze.end)
 
         # Combina os caminhos
-        return forward_path + backward_path[1:]
+        return forward_path[1:] + backward_path[1:-1]
 
     # Inicialização das estruturas para busca em ambas as direções
     forward_open = [(manhattan_distance(maze.start, maze.end), 0, maze.start, [maze.start])]

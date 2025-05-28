@@ -30,8 +30,7 @@ def solveBidirectionalSearch(maze):
             current = backward_parent[current]
         backward_path.append(maze.end)
 
-        # Combina os caminhos
-        return forward_path + backward_path[1:]
+        return forward_path[1:] + backward_path[1:-1]
 
     # Inicialização das filas para busca em ambas as direções
     forward_queue = deque([maze.start])

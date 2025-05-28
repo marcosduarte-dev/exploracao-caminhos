@@ -181,7 +181,7 @@ class Main:
                     self.statistics[self.current_tab][self.current_algorithm] = {
                         "visited_count": len(visited),
                         "time_taken": time_taken,
-                        "path_length": len(path)
+                        "path_length": len(path) - 1
                     }
                     self.visited_history[self.current_tab][self.current_algorithm] = history
                     if history and self.show_visited:
