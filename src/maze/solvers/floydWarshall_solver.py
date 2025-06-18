@@ -2,6 +2,7 @@ from utils.maze_utils import is_valid_position, Benchmark
 import math
 
 @Benchmark.measure
+@Benchmark.measure_memory
 def solveFloydWarshall(maze):
     """
     Resolve um labirinto usando o algoritmo Floyd-Warshall.

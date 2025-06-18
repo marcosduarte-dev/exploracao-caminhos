@@ -2,6 +2,7 @@ import heapq
 from utils.maze_utils import is_valid_position, Benchmark
 
 @Benchmark.measure
+@Benchmark.measure_memory
 def solveBidirectionalAstar(maze):
     """
     Resolve um labirinto usando uma implementação bidirecional do algoritmo A* com distância de Manhattan.

@@ -2,6 +2,7 @@ from collections import deque
 from utils.maze_utils import is_valid_position, Benchmark
 
 @Benchmark.measure
+@Benchmark.measure_memory
 def solveBidirectionalSearch(maze):
     def get_neighbors(pos):
         x, y = pos

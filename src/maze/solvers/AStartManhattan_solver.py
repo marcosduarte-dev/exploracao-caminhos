@@ -2,6 +2,7 @@ import heapq
 from utils.maze_utils import is_valid_position, Benchmark
 
 @Benchmark.measure
+@Benchmark.measure_memory
 def solveAstarManhattan(maze):
     # Função heurística de Manhattan (distância de Manhattan até o destino)
     def manhattan_distance(pos):

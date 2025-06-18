@@ -1,4 +1,6 @@
 from enums.maze_size import MazeSize
+import psutil
+import os
 from maze.maze import Maze
 from functools import wraps
 import time
@@ -138,10 +140,16 @@ def _find_end_position(width, height, grid):
         grid[height - 1][width - 2] = 0
     return (width - 1, height - 1)
 
+def get_memory_usage():
+    """
+    Retorna o uso atual de memória do processo em MB.
+    """
+    process = psutil.Process(os.getpid())
+    return process.memory_info().rss / 1024 / 1024  # Converte para MB
 
 class Benchmark:
     """
-    Classe utilitária para medição de tempo de execução.
+    Classe utilitária para medição de estatísticas.
     """
     @staticmethod
     def measure(func):
@@ -167,3 +175,21 @@ class Benchmark:
             return (result, elapsed_ms)
             
         return timed
+    
+    @staticmethod
+    def measure_memory(func):
+        """
+        Decorador que mede o uso de memória.
+        """
+        @wraps(func)
+        def measured(*args, **kwargs):
+            initial_memory = get_memory_usage()
+            result = func(*args, **kwargs)
+            final_memory = get_memory_usage()
+            memory_used = final_memory - initial_memory
+
+            if isinstance(result, tuple):
+                return (*result, memory_used)
+            return (result, memory_used)
+
+        return measured

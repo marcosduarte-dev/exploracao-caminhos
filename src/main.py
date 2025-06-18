@@ -8,10 +8,8 @@ from utils.maze_utils import generate_mazes
 from ui.ui import UI
 from maze.solvers.bfs_solver import solveBfs
 from maze.solvers.AStartManhattan_solver import solveAstarManhattan
-from maze.solvers.greedy_bfs_solver import solveGreedyBFS
 from maze.solvers.bidirectional_search_solver import solveBidirectionalSearch
 from maze.solvers.bidirectional_astar_solver import solveBidirectionalAstar
-from maze.solvers.dijkstra_solver import solveDijkstra
 from ui.slider import Slider
 
 class Main:
@@ -108,80 +106,56 @@ class Main:
                     visited = []
                     history = []
                     time_taken = 0
+                    memory_used = 0
                     if algorithm == Algorithm.BFS:
                         self.current_algorithm = Algorithm.BFS
                         if(self.solutions.get(self.current_tab) == {} or self.solutions[self.current_tab].get(self.current_algorithm) is None):
-                            path, visited, history, time_taken = solveBfs(self.mazes[self.current_tab])
+                            path, visited, history, time_taken, memory_used = solveBfs(self.mazes[self.current_tab])
                         else:
                             path = self.solutions[self.current_tab][self.current_algorithm]
                             visited = self.visited_cells[self.current_tab][self.current_algorithm]
                             history = self.visited_history[self.current_tab][self.current_algorithm]
                             time_taken = self.statistics[self.current_tab][self.current_algorithm]["time_taken"]
-                    # if algorithm == Algorithm.DFS:
-                    #     # Implementar DFS
-                    #     path = []
-                    #     visited = []
-                    #     time_taken = []
-                    #     print("DFS")
-                    # if algorithm == Algorithm.DIJKSTRA:
-                    #     self.current_algorithm = Algorithm.DIJKSTRA
-                    #     if(self.solutions.get(self.current_tab) == {} or self.solutions[self.current_tab].get(self.current_algorithm) is None):
-                    #         path, visited, history, time_taken = solveDijkstra(self.mazes[self.current_tab])
-                    #     else:
-                    #         path = self.solutions[self.current_tab][self.current_algorithm]
-                    #         visited = self.visited_cells[self.current_tab][self.current_algorithm]
-                    #         history = self.visited_history[self.current_tab][self.current_algorithm]
-                    #         time_taken = self.statistics[self.current_tab][self.current_algorithm]["time_taken"]
-                    # if algorithm == Algorithm.JOHNSON:
-                    #     self.current_algorithm = Algorithm.JOHNSON
-                    #     path, visited, history, time_taken = solveJohnson(self.mazes[self.current_tab])
-                    # if algorithm == Algorithm.FLOYD_WARSHALL:
-                    #     self.current_algorithm = Algorithm.FLOYD_WARSHALL
-                    #     path, visited, history, time_taken = solveFloydWarshall(self.mazes[self.current_tab])
+                            memory_used = self.statistics[self.current_tab][self.current_algorithm]["memory_used"]
                     if algorithm == Algorithm.ASTAR_MANHATTAN:
                         self.current_algorithm = Algorithm.ASTAR_MANHATTAN
                         if(self.solutions.get(self.current_tab) == {} or self.solutions[self.current_tab].get(self.current_algorithm) is None):
-                            path, visited, history, time_taken = solveAstarManhattan(self.mazes[self.current_tab])
+                            path, visited, history, time_taken, memory_used = solveAstarManhattan(self.mazes[self.current_tab])
                         else:
                             path = self.solutions[self.current_tab][self.current_algorithm]
                             visited = self.visited_cells[self.current_tab][self.current_algorithm]
                             history = self.visited_history[self.current_tab][self.current_algorithm]
                             time_taken = self.statistics[self.current_tab][self.current_algorithm]["time_taken"]
-                    # if algorithm == Algorithm.GREEDY_BFS:
-                    #     self.current_algorithm = Algorithm.GREEDY_BFS
-                    #     if(self.solutions.get(self.current_tab) == {} or self.solutions[self.current_tab].get(self.current_algorithm) is None):
-                    #         path, visited, history, time_taken = solveGreedyBFS(self.mazes[self.current_tab])
-                    #     else:
-                    #         path = self.solutions[self.current_tab][self.current_algorithm]
-                    #         visited = self.visited_cells[self.current_tab][self.current_algorithm]
-                    #         history = self.visited_history[self.current_tab][self.current_algorithm]
-                    #         time_taken = self.statistics[self.current_tab][self.current_algorithm]["time_taken"]
+                            memory_used = self.statistics[self.current_tab][self.current_algorithm]["memory_used"]
                     if algorithm == Algorithm.BIDIRECTIONAL_SEARCH:
                         self.current_algorithm = Algorithm.BIDIRECTIONAL_SEARCH
                         if(self.solutions.get(self.current_tab) == {} or self.solutions[self.current_tab].get(self.current_algorithm) is None):
-                            path, visited, history, time_taken = solveBidirectionalSearch(self.mazes[self.current_tab])
+                            path, visited, history, time_taken, memory_used = solveBidirectionalSearch(self.mazes[self.current_tab])
                         else:
                             path = self.solutions[self.current_tab][self.current_algorithm]
                             visited = self.visited_cells[self.current_tab][self.current_algorithm]
                             history = self.visited_history[self.current_tab][self.current_algorithm]
                             time_taken = self.statistics[self.current_tab][self.current_algorithm]["time_taken"]
+                            memory_used = self.statistics[self.current_tab][self.current_algorithm]["memory_used"]
                     
                     if algorithm == Algorithm.BIDIRECTIONAL_ASTAR:
                         self.current_algorithm = Algorithm.BIDIRECTIONAL_ASTAR
                         if(self.solutions.get(self.current_tab) == {} or self.solutions[self.current_tab].get(self.current_algorithm) is None):
-                            path, visited, history, time_taken = solveBidirectionalAstar(self.mazes[self.current_tab])
+                            path, visited, history, time_taken, memory_used = solveBidirectionalAstar(self.mazes[self.current_tab])
                         else:
                             path = self.solutions[self.current_tab][self.current_algorithm]
                             visited = self.visited_cells[self.current_tab][self.current_algorithm]
                             history = self.visited_history[self.current_tab][self.current_algorithm]
                             time_taken = self.statistics[self.current_tab][self.current_algorithm]["time_taken"]
+                            memory_used = self.statistics[self.current_tab][self.current_algorithm]["memory_used"]
                     
                     self.solutions[self.current_tab][self.current_algorithm] = path
                     self.visited_cells[self.current_tab][self.current_algorithm] = visited
                     self.statistics[self.current_tab][self.current_algorithm] = {
                         "visited_count": len(visited),
                         "time_taken": time_taken,
-                        "path_length": len(path) - 1
+                        "path_length": len(path) - 1,
+                        "memory_used": memory_used
                     }
                     self.visited_history[self.current_tab][self.current_algorithm] = history
                     if history and self.show_visited:
