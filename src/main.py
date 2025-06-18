@@ -107,47 +107,8 @@ class Main:
                     history = []
                     time_taken = 0
                     memory_used = 0
-                    if algorithm == Algorithm.BFS:
-                        self.current_algorithm = Algorithm.BFS
-                        if(self.solutions.get(self.current_tab) == {} or self.solutions[self.current_tab].get(self.current_algorithm) is None):
-                            path, visited, history, time_taken, memory_used = solveBfs(self.mazes[self.current_tab])
-                        else:
-                            path = self.solutions[self.current_tab][self.current_algorithm]
-                            visited = self.visited_cells[self.current_tab][self.current_algorithm]
-                            history = self.visited_history[self.current_tab][self.current_algorithm]
-                            time_taken = self.statistics[self.current_tab][self.current_algorithm]["time_taken"]
-                            memory_used = self.statistics[self.current_tab][self.current_algorithm]["memory_used"]
-                    if algorithm == Algorithm.ASTAR_MANHATTAN:
-                        self.current_algorithm = Algorithm.ASTAR_MANHATTAN
-                        if(self.solutions.get(self.current_tab) == {} or self.solutions[self.current_tab].get(self.current_algorithm) is None):
-                            path, visited, history, time_taken, memory_used = solveAstarManhattan(self.mazes[self.current_tab])
-                        else:
-                            path = self.solutions[self.current_tab][self.current_algorithm]
-                            visited = self.visited_cells[self.current_tab][self.current_algorithm]
-                            history = self.visited_history[self.current_tab][self.current_algorithm]
-                            time_taken = self.statistics[self.current_tab][self.current_algorithm]["time_taken"]
-                            memory_used = self.statistics[self.current_tab][self.current_algorithm]["memory_used"]
-                    if algorithm == Algorithm.BIDIRECTIONAL_SEARCH:
-                        self.current_algorithm = Algorithm.BIDIRECTIONAL_SEARCH
-                        if(self.solutions.get(self.current_tab) == {} or self.solutions[self.current_tab].get(self.current_algorithm) is None):
-                            path, visited, history, time_taken, memory_used = solveBidirectionalSearch(self.mazes[self.current_tab])
-                        else:
-                            path = self.solutions[self.current_tab][self.current_algorithm]
-                            visited = self.visited_cells[self.current_tab][self.current_algorithm]
-                            history = self.visited_history[self.current_tab][self.current_algorithm]
-                            time_taken = self.statistics[self.current_tab][self.current_algorithm]["time_taken"]
-                            memory_used = self.statistics[self.current_tab][self.current_algorithm]["memory_used"]
-                    
-                    if algorithm == Algorithm.BIDIRECTIONAL_ASTAR:
-                        self.current_algorithm = Algorithm.BIDIRECTIONAL_ASTAR
-                        if(self.solutions.get(self.current_tab) == {} or self.solutions[self.current_tab].get(self.current_algorithm) is None):
-                            path, visited, history, time_taken, memory_used = solveBidirectionalAstar(self.mazes[self.current_tab])
-                        else:
-                            path = self.solutions[self.current_tab][self.current_algorithm]
-                            visited = self.visited_cells[self.current_tab][self.current_algorithm]
-                            history = self.visited_history[self.current_tab][self.current_algorithm]
-                            time_taken = self.statistics[self.current_tab][self.current_algorithm]["time_taken"]
-                            memory_used = self.statistics[self.current_tab][self.current_algorithm]["memory_used"]
+
+                    path, visited, history, time_taken, memory_used = self.solve_algorithm(algorithm)
                     
                     self.solutions[self.current_tab][self.current_algorithm] = path
                     self.visited_cells[self.current_tab][self.current_algorithm] = visited
@@ -169,11 +130,9 @@ class Main:
                             self.start_x + 25, ALTURA_TELA - 30, 400 - 40, 10, 
                             0, len(history) - 1, 0
                         )
-                    print("Quantidade visitada: " + str(len(visited)))
-                    print("Tempo levado: " + str(time_taken) + " ms" )
-                    print("Tamanho do caminho: " + str(len(path)))
 
                     self.statistics[self.current_tab][self.current_algorithm]
+                    #TODO: SALVAR NO BD AS ESTATISTICAS AO RESOLVER.
 
                 if hasattr(self.ui, 'generate_button_rect') and self.ui.generate_button_rect.collidepoint(event.pos):
                     self.mazes, self.solutions, self.visited_cells, self.statistics, self.visited_history, self.sliders = generate_mazes()
@@ -226,6 +185,35 @@ class Main:
            self.ui.draw_statistics(self.screen, stats, self.start_x + 20, 450)
 
         pygame.display.flip()
+
+    def solve_algorithm(self, algorithm):
+        # Mapeamento de algoritmos para suas funções de resolução
+        algorithm_solvers = {
+            Algorithm.BFS: solveBfs,
+            Algorithm.ASTAR_MANHATTAN: solveAstarManhattan,
+            Algorithm.BIDIRECTIONAL_SEARCH: solveBidirectionalSearch,
+            Algorithm.BIDIRECTIONAL_ASTAR: solveBidirectionalAstar,
+        }
+
+        # Definir o algoritmo atual
+        self.current_algorithm = algorithm
+
+        # Verificar se já existe solução armazenada
+        if (self.solutions.get(self.current_tab) == {} or 
+            self.solutions[self.current_tab].get(self.current_algorithm) is None):
+            
+            # Chamar a função de resolução correspondente
+            solver_function = algorithm_solvers[algorithm]
+            path, visited, history, time_taken, memory_used = solver_function(self.mazes[self.current_tab])
+        else:
+            # Recuperar solução armazenada
+            path = self.solutions[self.current_tab][self.current_algorithm]
+            visited = self.visited_cells[self.current_tab][self.current_algorithm]
+            history = self.visited_history[self.current_tab][self.current_algorithm]
+            time_taken = self.statistics[self.current_tab][self.current_algorithm]["time_taken"]
+            memory_used = self.statistics[self.current_tab][self.current_algorithm]["memory_used"]
+
+        return path, visited, history, time_taken, memory_used
 
     def run(self):
         """

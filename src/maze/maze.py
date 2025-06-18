@@ -38,6 +38,7 @@ class Maze:
         Atualiza a grade do labirinto e define as posições de início e fim.
         """
         self.grid, self.start, self.end = self.generator(self.width, self.height)  # Gera o labirinto
+        #TODO: COLOCAR AQUI PARA SALVAR NA TABELA LABIRINTO OS 3 LABIRINTOS GERADOS.
 
     def __str__(self):
         """
