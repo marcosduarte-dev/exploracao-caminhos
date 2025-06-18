@@ -2,6 +2,7 @@ from collections import deque
 from utils.maze_utils import is_valid_position, Benchmark
 
 @Benchmark.measure
+@Benchmark.measure_memory
 def solveBfs(maze):
     """
     Resolve um labirinto usando o algoritmo Breadth-First Search (BFS).

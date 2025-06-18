@@ -2,6 +2,7 @@ import heapq
 from utils.maze_utils import is_valid_position, Benchmark
 
 @Benchmark.measure
+@Benchmark.measure_memory
 def solveJohnson(maze):
     """
     Resolve um labirinto usando o algoritmo de Johnson (adaptado).

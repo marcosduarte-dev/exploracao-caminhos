@@ -2,6 +2,7 @@ import heapq
 from utils.maze_utils import is_valid_position, Benchmark
 
 @Benchmark.measure
+@Benchmark.measure_memory
 def solveDijkstra(maze):
     """
     Resolve um labirinto usando uma implementação otimizada do algoritmo de Dijkstra.

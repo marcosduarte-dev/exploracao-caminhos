@@ -389,12 +389,12 @@ class UI:
                         plus_thickness)
 
     def draw_statistics(self, screen, stats, x, y):
-        """Desenha as estatísticas com estilo moderno"""
-        if not stats:
+        """Desenha as estatísticas do algoritmo"""
+        if stats is None:
             return
 
         # Container para estatísticas
-        stats_rect = pygame.Rect(x - 10, y - 10, 300, 100)
+        stats_rect = pygame.Rect(x - 10, y - 10, 300, 125)
         pygame.draw.rect(screen, self.primary_color, stats_rect, border_radius=10)
         pygame.draw.rect(screen, self.border_color, stats_rect, 1, border_radius=10)  # Borda suave
 
@@ -404,8 +404,10 @@ class UI:
         visited_text = font.render(f"• Células visitadas: {stats['visited_count']}", True, self.text_color)
         time_text = font.render(f"• Tempo: {stats['time_taken']:.2f} ms", True, self.text_color)
         path_text = font.render(f"• Tamanho do caminho: {stats['path_length']}", True, self.text_color)
+        memory_text = font.render(f"• Uso de memória: {stats['memory_used']:.2f} MB", True, self.text_color)
 
         screen.blit(visited_text, (x, y))
         screen.blit(time_text, (x, y + 25))
         screen.blit(path_text, (x, y + 50))
+        screen.blit(memory_text, (x, y + 75))
 
