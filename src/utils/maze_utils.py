@@ -3,9 +3,10 @@ import psutil
 import os
 from maze.maze import Maze
 from functools import wraps
+from utils.bd_utils import inserir_labirintos
 import time
 
-def generate_mazes():
+def generate_mazes(database):
     """
     Gera labirintos para cada tamanho definido no enum MazeSize.
 
@@ -56,6 +57,9 @@ def generate_mazes():
         MazeSize.MEDIUM: {},
         MazeSize.LARGE: {}
     }
+
+    if(database):
+        inserir_labirintos(mazes, database)
 
     return mazes, solutions, visited_cells, statistics, visited_history, sliders
 

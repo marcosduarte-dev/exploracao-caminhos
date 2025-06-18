@@ -5,6 +5,7 @@ from enums.colour import *
 from enums.maze_size import MazeSize
 from enums.algorithms import Algorithm
 from utils.maze_utils import generate_mazes
+from utils.bd_utils import open_conection
 from ui.ui import UI
 from maze.solvers.bfs_solver import solveBfs
 from maze.solvers.AStartManhattan_solver import solveAstarManhattan
@@ -49,7 +50,9 @@ class Main:
 
         self.running = True
 
-        self.mazes, self.solutions, self.visited_cells, self.statistics, self.visited_history, self.sliders = generate_mazes()
+        self.database = open_conection()
+
+        self.mazes, self.solutions, self.visited_cells, self.statistics, self.visited_history, self.sliders = generate_mazes(self.database)
 
     def _load_sprites(self):
         """
@@ -86,6 +89,7 @@ class Main:
 
     def _handle_mouse_button_down(self, event):
         """Processa cliques do mouse."""
+        contagem_generate_maze = 0
         if event.button == 1:  # Clique esquerdo
             # Verifica se o clique foi no botão toggle
             if hasattr(self.ui, 'toggle_button_rect') and self.ui.toggle_button_rect.collidepoint(event.pos):
@@ -132,11 +136,13 @@ class Main:
                         )
 
                     self.statistics[self.current_tab][self.current_algorithm]
-                    #TODO: SALVAR NO BD AS ESTATISTICAS AO RESOLVER.
 
                 if hasattr(self.ui, 'generate_button_rect') and self.ui.generate_button_rect.collidepoint(event.pos):
-                    self.mazes, self.solutions, self.visited_cells, self.statistics, self.visited_history, self.sliders = generate_mazes()
-                    self.current_algorithm = None  # limpa seleção anterior
+                    contagem_generate_maze = contagem_generate_maze + 1
+                    if(contagem_generate_maze == 4):
+                        self.mazes, self.solutions, self.visited_cells, self.statistics, self.visited_history, self.sliders = generate_mazes(self.database)
+                        self.current_algorithm = None  # limpa seleção anterior
+                        contagem_generate_maze = 0
 
             if event.pos[0] < 800:
                 self.dragging = True
@@ -205,6 +211,8 @@ class Main:
             # Chamar a função de resolução correspondente
             solver_function = algorithm_solvers[algorithm]
             path, visited, history, time_taken, memory_used = solver_function(self.mazes[self.current_tab])
+
+            #TODO: SALVAR NO BD AS ESTATISTICAS AO RESOLVER.
         else:
             # Recuperar solução armazenada
             path = self.solutions[self.current_tab][self.current_algorithm]
@@ -213,6 +221,7 @@ class Main:
             time_taken = self.statistics[self.current_tab][self.current_algorithm]["time_taken"]
             memory_used = self.statistics[self.current_tab][self.current_algorithm]["memory_used"]
 
+        print(time_taken)
         return path, visited, history, time_taken, memory_used
 
     def run(self):

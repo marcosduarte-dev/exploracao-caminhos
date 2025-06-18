@@ -51,6 +51,15 @@ class Maze:
         for row in self.grid:
             maze_str += " ".join(str(cell) for cell in row) + "\n"
         return maze_str
+    
+    def get_size(self):
+        """
+        Retorna o tamanho do labirinto para insercao no banco de dados
+
+        Returms:
+            int: tamanho do labirinto
+        """
+        return self.height
 
     def get_cell(self, x, y):
         """
