@@ -22,7 +22,6 @@ def open_conection():
        
 def inserir_labirintos(mazes, database):
     for _, maze_obj in mazes.items():
-        print(maze_obj)
         if isinstance(maze_obj, Maze):
             tamanho = maze_obj.width
             id = gerar_id_labirinto(maze_obj.grid)
@@ -31,6 +30,23 @@ def inserir_labirintos(mazes, database):
                 .insert({"id": id, "tamanho": tamanho, "representacao": maze_obj.grid})
                 .execute()
             )
+
+def inserir_estatistica(database, maze, algoritmo, tempo_execucao, celulas_visitadas, tamanho_caminho, memory):
+    if(database):
+        id = gerar_id_labirinto(maze.grid)
+        _ = (
+            database.table("estatisticas")
+            .insert({
+                    "id_labirinto": id,
+                    "algoritmo": algoritmo.value,
+                    "tamanho_labirinto": maze.width,
+                    "tempo_execucao": tempo_execucao,
+                    "celulas_visitadas": celulas_visitadas,
+                    "tamanho_caminho": tamanho_caminho,
+                    "memoria": memory
+                    })
+            .execute()
+        )
 
 def gerar_id_labirinto(grid):
     maze_str = json.dumps(grid, sort_keys=True)

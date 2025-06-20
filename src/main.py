@@ -5,7 +5,7 @@ from enums.colour import *
 from enums.maze_size import MazeSize
 from enums.algorithms import Algorithm
 from utils.maze_utils import generate_mazes
-from utils.bd_utils import open_conection
+from utils.bd_utils import open_conection, inserir_estatistica
 from ui.ui import UI
 from maze.solvers.bfs_solver import solveBfs
 from maze.solvers.AStartManhattan_solver import solveAstarManhattan
@@ -212,7 +212,7 @@ class Main:
             solver_function = algorithm_solvers[algorithm]
             path, visited, history, time_taken, memory_used = solver_function(self.mazes[self.current_tab])
 
-            #TODO: SALVAR NO BD AS ESTATISTICAS AO RESOLVER.
+            inserir_estatistica(self.database, self.mazes[self.current_tab], algorithm, time_taken, len(visited), len(path)-1, memory_used)
         else:
             # Recuperar solução armazenada
             path = self.solutions[self.current_tab][self.current_algorithm]
