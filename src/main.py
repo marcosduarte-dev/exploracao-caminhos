@@ -221,7 +221,6 @@ class Main:
             time_taken = self.statistics[self.current_tab][self.current_algorithm]["time_taken"]
             memory_used = self.statistics[self.current_tab][self.current_algorithm]["memory_used"]
 
-        print(time_taken)
         return path, visited, history, time_taken, memory_used
 
     def run(self):
