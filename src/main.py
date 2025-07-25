@@ -23,11 +23,6 @@ class Main:
         """
         pygame.init()
 
-        # Configuração da janela
-        pygame.display.set_caption(TITULO_PROJETO)
-        self.screen = pygame.display.set_mode((LARGURA_TELA, ALTURA_TELA))
-        self.clock = pygame.time.Clock()
-
         # Caminhos para recursos
         self.current_path = os.path.dirname(__file__)
         self.sprites_path = {
@@ -35,6 +30,14 @@ class Main:
             'normal_tab': os.path.join(self.current_path, 'ui/sprites', 'tab.png')
         }
         self.font_path = os.path.join(self.current_path, 'ui', 'font', 'Inter.ttf')
+        self.logo_path = os.path.join(self.current_path, 'ui/sprites', 'labirinto.png')
+
+        # Configuração da janela
+        pygame.display.set_caption(TITULO_PROJETO)
+        self.screen = pygame.display.set_mode((LARGURA_TELA, ALTURA_TELA))
+        self.clock = pygame.time.Clock()
+        logo = pygame.image.load(self.logo_path).convert_alpha()
+        pygame.display.set_icon(logo)
 
         # Inicialização de componentes
         self.ui = UI(self.font_path, self.screen)
