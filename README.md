@@ -15,6 +15,8 @@ Este projeto é uma ferramenta visual para gerar, resolver e comparar diferentes
 *   **Geração de Labirintos:** Criação de labirintos com diferentes tamanhos (Pequeno, Médio, Grande).
 *   **Algoritmos de Resolução:** Implementação de múltiplos algoritmos de busca, incluindo:
     *   Busca em Largura (BFS)
+    *   Busca em Profundidade (DFS)
+    *   Busca Gulosa (Greedy BFS)
     *   A* (com heurística de Manhattan)
     *   Busca Bidirecional
     *   Busca Bidirecional A*
