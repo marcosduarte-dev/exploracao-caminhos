@@ -8,7 +8,7 @@ class Algorithm(Enum):
     """
 
     BFS = 0
-    #DFS = 1
+    DFS = 1
     #DIJKSTRA = 2
     GREEDY_BFS = 3
     #JOHNSON = 3

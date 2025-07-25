@@ -12,6 +12,7 @@ from maze.solvers.AStartManhattan_solver import solveAstarManhattan
 from maze.solvers.bidirectional_search_solver import solveBidirectionalSearch
 from maze.solvers.bidirectional_astar_solver import solveBidirectionalAstar
 from maze.solvers.greedy_bfs_solver import solveGreedyBFS
+from maze.solvers.dfs_solver import solveDfs
 from ui.slider import Slider
 
 class Main:
@@ -201,6 +202,7 @@ class Main:
             Algorithm.BIDIRECTIONAL_SEARCH: solveBidirectionalSearch,
             Algorithm.BIDIRECTIONAL_ASTAR: solveBidirectionalAstar,
             Algorithm.GREEDY_BFS: solveGreedyBFS,
+            Algorithm.DFS: solveDfs,
         }
 
         # Definir o algoritmo atual
