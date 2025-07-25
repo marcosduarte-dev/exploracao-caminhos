@@ -124,7 +124,7 @@ class Main:
                     self.statistics[self.current_tab][self.current_algorithm] = {
                         "visited_count": len(visited),
                         "time_taken": time_taken,
-                        "path_length": (len(path) - 3) if (self.current_algorithm == Algorithm.BIDIRECTIONAL_SEARCH or self.current_algorithm ==  Algorithm.BIDIRECTIONAL_ASTAR) else (len(path) - 1),
+                        "path_length": (len(path) - 1),
                         "memory_used": memory_used
                     }
                     self.visited_history[self.current_tab][self.current_algorithm] = history
