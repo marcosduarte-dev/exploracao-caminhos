@@ -195,22 +195,25 @@ class Main:
             self.visited_history, self.sliders
         )
         self.ui.draw_tabs(self.current_tab, self.sprites)
-        self.ui.draw_algorithm_buttons(self.current_algorithm, self.sprites)
-        button_width = 50  # Tamanho do botão circular
-        x = self.start_x + (650 - button_width) // 2
-        self.ui.draw_generate_button(self.screen, x, 50)  # Y = 50, por exemplo
 
-        # Desenha o check no botão toggle
-        if hasattr(self.ui, 'toggle_button_rect'):
-            self.ui.draw_toggle_check(self.screen, self.ui.toggle_button_rect, self.ui.show_slider)
+        if self.current_tab.value != 3:  # Se não for a aba de estatísticas
 
-        # Desenhar estatísticas (abaixo dos controles)
-        stats = self.statistics[self.current_tab].get(self.current_algorithm)
-        if stats:
-           self.ui.draw_statistics(self.screen, stats, self.start_x + 20, 450)
+            self.ui.draw_algorithm_buttons(self.current_algorithm, self.sprites)
+            button_width = 50  # Tamanho do botão circular
+            x = self.start_x + (650 - button_width) // 2
+            self.ui.draw_generate_button(self.screen, x, 50)  # Y = 50, por exemplo
 
-        if self.is_loading:
-            self.ui.draw_loading_screen()
+            # Desenha o check no botão toggle
+            if hasattr(self.ui, 'toggle_button_rect'):
+                self.ui.draw_toggle_check(self.screen, self.ui.toggle_button_rect, self.ui.show_slider)
+
+            # Desenhar estatísticas (abaixo dos controles)
+            stats = self.statistics[self.current_tab].get(self.current_algorithm)
+            if stats:
+                self.ui.draw_statistics(self.screen, stats, self.start_x + 20, 450)
+
+            if self.is_loading:
+                self.ui.draw_loading_screen()
 
         pygame.display.flip()
 
