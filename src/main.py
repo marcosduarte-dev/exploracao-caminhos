@@ -52,6 +52,8 @@ class Main:
         self.step_slider = None
         self.start_x = LARGURA_TELA - 400
         self.ui.show_slider = False  # Estado inicial do slider (desabilitado)
+        self.contagem_generate_maze = 0
+        self.is_loading = False
 
         self.running = True
 
@@ -94,7 +96,6 @@ class Main:
 
     def _handle_mouse_button_down(self, event):
         """Processa cliques do mouse."""
-        contagem_generate_maze = 0
         if event.button == 1:  # Clique esquerdo
             # Verifica se o clique foi no botão toggle
             if hasattr(self.ui, 'toggle_button_rect') and self.ui.toggle_button_rect.collidepoint(event.pos):
@@ -109,45 +110,58 @@ class Main:
                         self.current_algorithm = None
                     break
             # Verifica se o clique foi em um algoritmo
-            for algorithm, rect in self.ui.algorithm_buttons.items():
+            for algorithm_key, rect in self.ui.algorithm_buttons.items():
                 if rect.collidepoint(event.pos):
-                    path = []
-                    visited = []
-                    history = []
-                    time_taken = 0
-                    memory_used = 0
+                    self.is_loading = True
+                    self.update()
 
-                    path, visited, history, time_taken, memory_used = self.solve_algorithm(algorithm)
+                    if algorithm_key == "run_all":
+                        self.run_all_algorithms()
+                    else:
+                        path = []
+                        visited = []
+                        history = []
+                        time_taken = 0
+                        memory_used = 0
+
+                        path, visited, history, time_taken, memory_used = self.solve_algorithm(algorithm_key)
+                        
+                        self.solutions[self.current_tab][self.current_algorithm] = path
+                        self.visited_cells[self.current_tab][self.current_algorithm] = visited
+                        self.statistics[self.current_tab][self.current_algorithm] = {
+                            "visited_count": len(visited),
+                            "time_taken": time_taken,
+                            "path_length": (len(path) - 1),
+                            "memory_used": memory_used
+                        }
+                        self.visited_history[self.current_tab][self.current_algorithm] = history
+                        if history and self.show_visited:
+                            if not hasattr(self, 'sliders'):
+                                self.sliders = {
+                                    MazeSize.SMALL: {},
+                                    MazeSize.MEDIUM: {},
+                                    MazeSize.LARGE: {}
+                                }
+                            self.sliders[self.current_tab][self.current_algorithm] = Slider(
+                                self.start_x + 25, ALTURA_TELA - 30, 400 - 40, 10, 
+                                0, len(history) - 1, 0
+                            )
+
+                        self.statistics[self.current_tab][self.current_algorithm]
                     
-                    self.solutions[self.current_tab][self.current_algorithm] = path
-                    self.visited_cells[self.current_tab][self.current_algorithm] = visited
-                    self.statistics[self.current_tab][self.current_algorithm] = {
-                        "visited_count": len(visited),
-                        "time_taken": time_taken,
-                        "path_length": (len(path) - 1),
-                        "memory_used": memory_used
-                    }
-                    self.visited_history[self.current_tab][self.current_algorithm] = history
-                    if history and self.show_visited:
-                        if not hasattr(self, 'sliders'):
-                            self.sliders = {
-                                MazeSize.SMALL: {},
-                                MazeSize.MEDIUM: {},
-                                MazeSize.LARGE: {}
-                            }
-                        self.sliders[self.current_tab][self.current_algorithm] = Slider(
-                            self.start_x + 25, ALTURA_TELA - 30, 400 - 40, 10, 
-                            0, len(history) - 1, 0
-                        )
+                    self.is_loading = False
+                    break # Sair do loop de botões de algoritmo
 
-                    self.statistics[self.current_tab][self.current_algorithm]
-
-                if hasattr(self.ui, 'generate_button_rect') and self.ui.generate_button_rect.collidepoint(event.pos):
-                    contagem_generate_maze = contagem_generate_maze + 1
-                    if(contagem_generate_maze == 4):
-                        self.mazes, self.solutions, self.visited_cells, self.statistics, self.visited_history, self.sliders = generate_mazes(self.database)
-                        self.current_algorithm = None  # limpa seleção anterior
-                        contagem_generate_maze = 0
+            if hasattr(self.ui, 'generate_button_rect') and self.ui.generate_button_rect.collidepoint(event.pos):
+                #self.contagem_generate_maze = self.contagem_generate_maze + 1
+                self.contagem_generate_maze = 4
+                if(self.contagem_generate_maze == 4):
+                    self.is_loading = True
+                    self.update()
+                    self.mazes, self.solutions, self.visited_cells, self.statistics, self.visited_history, self.sliders = generate_mazes(self.database)
+                    self.current_algorithm = None  # limpa seleção anterior
+                    self.contagem_generate_maze = 0
+                    self.is_loading = False
 
             if event.pos[0] < 800:
                 self.dragging = True
@@ -195,6 +209,9 @@ class Main:
         if stats:
            self.ui.draw_statistics(self.screen, stats, self.start_x + 20, 450)
 
+        if self.is_loading:
+            self.ui.draw_loading_screen()
+
         pygame.display.flip()
 
     def solve_algorithm(self, algorithm):
@@ -229,6 +246,34 @@ class Main:
             memory_used = self.statistics[self.current_tab][self.current_algorithm]["memory_used"]
 
         return path, visited, history, time_taken, memory_used
+
+    def run_all_algorithms(self):
+        """Executa todos os algoritmos de resolução de labirinto."""
+        for algorithm in Algorithm:
+            print(f"Running {algorithm.name}...")
+            path, visited, history, time_taken, memory_used = self.solve_algorithm(algorithm)
+            
+            self.solutions[self.current_tab][algorithm] = path
+            self.visited_cells[self.current_tab][algorithm] = visited
+            self.statistics[self.current_tab][algorithm] = {
+                "visited_count": len(visited),
+                "time_taken": time_taken,
+                "path_length": (len(path) - 1),
+                "memory_used": memory_used
+            }
+            self.visited_history[self.current_tab][algorithm] = history
+            if history and self.show_visited:
+                if not hasattr(self, 'sliders'):
+                    self.sliders = {
+                        MazeSize.SMALL: {},
+                        MazeSize.MEDIUM: {},
+                        MazeSize.LARGE: {}
+                    }
+                self.sliders[self.current_tab][algorithm] = Slider(
+                    self.start_x + 25, ALTURA_TELA - 30, 400 - 40, 10, 
+                    0, len(history) - 1, 0
+                )
+        print("All algorithms finished.")
 
     def run(self):
         """
