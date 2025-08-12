@@ -78,7 +78,10 @@ class MainWindow(QMainWindow):
         self.tabs = QTabWidget()
         self.tabs.currentChanged.connect(self.tab_changed)
         for size in MazeSize:
-            self.tabs.addTab(QWidget(), size.display_name)
+            if size == MazeSize.REPORT:
+                self.tabs.addTab(QWidget(), size.display_name)
+            else:
+                self.tabs.addTab(QWidget(), size.display_name)
         sidebar_layout.addWidget(self.tabs)
 
         # 2. Controls Group
@@ -160,16 +163,16 @@ class MainWindow(QMainWindow):
                     btn.setChecked(False)
         
         if self.current_algorithm:
-            self.run_solver_with_dialog(self.current_algorithm)
+            self.run_solver(self.current_algorithm)
         else:
             self.update_maze_view()
             self.update_controls()
 
-    def _execute_solver(self, algorithm):
+    def run_solver(self, algorithm):
         if self.solutions[self.current_tab].get(algorithm) is not None:
-            if hasattr(self, 'run_all_progress') and self.run_all_progress.isVisible():
-                self.run_all_progress.setValue(self.run_all_progress.value() + 1)
-            return None
+            self.update_maze_view()
+            self.update_controls()
+            return
 
         solver_map = {
             Algorithm.BFS: solveBfs,
@@ -182,21 +185,13 @@ class MainWindow(QMainWindow):
         solver_function = solver_map[algorithm]
         maze = self.mazes[self.current_tab]
 
-        worker = SolverWorker(solver_function, maze)
-        worker.finished.connect(lambda result: self.on_solver_finished(algorithm, result))
-        worker.start()
-        return worker
-
-    def run_solver_with_dialog(self, algorithm):
-        if self.solutions[self.current_tab].get(algorithm) is not None:
-            self.update_maze_view()
-            self.update_controls()
-            return
-
-        self.progress_dialog = QProgressDialog(f"Resolvendo com {algorithm.display_name}...", "Cancelar", 0, 0, self)
+        self.progress_dialog = QProgressDialog("Resolvendo o labirinto...", "Cancelar", 0, 0, self)
         self.progress_dialog.setWindowModality(Qt.WindowModality.WindowModal)
         self.progress_dialog.show()
-        self._execute_solver(algorithm)
+
+        self.worker = SolverWorker(solver_function, maze)
+        self.worker.finished.connect(lambda result: self.on_solver_finished(algorithm, result))
+        self.worker.start()
 
     def on_solver_finished(self, algorithm, result):
         path, visited, history, time_taken, memory_used = result
@@ -211,37 +206,20 @@ class MainWindow(QMainWindow):
         }
         inserir_estatistica(self.database, self.mazes[self.current_tab], algorithm, time_taken, len(visited), len(path)-1 if path else 0, memory_used)
         
-        if hasattr(self, 'progress_dialog') and self.progress_dialog.isVisible():
-            self.progress_dialog.close()
-        
-        if hasattr(self, 'run_all_progress') and self.run_all_progress.isVisible():
-            self.run_all_progress.setValue(self.run_all_progress.value() + 1)
-
+        self.progress_dialog.close()
         self.update_maze_view()
         self.update_controls()
 
     def run_all_algorithms(self):
-        self.run_all_progress = QProgressDialog("Rodando todos os algoritmos...", "Cancelar", 0, len(Algorithm), self)
-        self.run_all_progress.setWindowModality(Qt.WindowModality.WindowModal)
-        self.run_all_progress.setValue(0)
-
-        for i, alg in enumerate(Algorithm):
-            self.run_all_progress.setLabelText(f"Rodando {alg.display_name}...")
-            QApplication.processEvents()
-
-            if self.run_all_progress.wasCanceled():
-                break
-            
-            self.current_algorithm = alg
+        # This should also be in a worker thread in a real app, but for simplicity...
+        for alg in Algorithm:
+            self.select_algorithm(alg)
             self.alg_buttons[alg].setChecked(True)
-
-            worker = self._execute_solver(alg)
-            if worker:
-                worker.wait()
-        
-        self.run_all_progress.close()
-        if not self.run_all_progress.wasCanceled():
-            QMessageBox.information(self, "Concluído", "Todos os algoritmos foram executados.")
+            QApplication.processEvents() # Keep UI responsive
+            if self.solutions[self.current_tab].get(alg) is None:
+                 self.run_solver(alg)
+                 self.worker.wait() # wait for it to finish before starting next
+        QMessageBox.information(self, "Concluído", "Todos os algoritmos foram executados.")
 
     def generate_new_mazes(self):
         self.mazes, self.solutions, self.visited_cells, self.statistics, self.visited_history, _ = generate_mazes(self.database)
