@@ -10,7 +10,7 @@ from utils.config import *
 from enums.maze_size import MazeSize
 from enums.algorithms import Algorithm
 from utils.maze_utils import generate_mazes
-from utils.bd_utils import open_conection, inserir_estatistica
+from utils.bd_utils import open_conection, inserir_estatistica, gerar_id_labirinto
 from maze.solvers.bfs_solver import solveBfs
 from maze.solvers.AStartManhattan_solver import solveAstarManhattan
 from maze.solvers.bidirectional_search_solver import solveBidirectionalSearch
@@ -198,13 +198,19 @@ class MainWindow(QMainWindow):
         self.solutions[self.current_tab][algorithm] = path
         self.visited_cells[self.current_tab][algorithm] = visited
         self.visited_history[self.current_tab][algorithm] = history
+        maze = self.mazes[self.current_tab]
+        maze_id = gerar_id_labirinto(maze.grid)
+        self.solutions[self.current_tab][algorithm] = path
+        self.visited_cells[self.current_tab][algorithm] = visited
+        self.visited_history[self.current_tab][algorithm] = history
         self.statistics[self.current_tab][algorithm] = {
+            "id_labirinto": maze_id,
             "visited_count": len(visited),
             "time_taken": time_taken,
             "path_length": (len(path) - 1) if path else 0,
             "memory_used": memory_used
         }
-        inserir_estatistica(self.database, self.mazes[self.current_tab], algorithm, time_taken, len(visited), len(path)-1 if path else 0, memory_used)
+        inserir_estatistica(self.database, maze, algorithm, time_taken, len(visited), len(path)-1 if path else 0, memory_used)
         
         self.progress_dialog.close()
         self.update_maze_view()
@@ -213,12 +219,19 @@ class MainWindow(QMainWindow):
     def run_all_algorithms(self):
         # This should also be in a worker thread in a real app, but for simplicity...
         for alg in Algorithm:
-            self.select_algorithm(alg)
-            self.alg_buttons[alg].setChecked(True)
-            QApplication.processEvents() # Keep UI responsive
             if self.solutions[self.current_tab].get(alg) is None:
-                 self.run_solver(alg)
-                 self.worker.wait() # wait for it to finish before starting next
+                self.current_algorithm = alg
+                for a, b in self.alg_buttons.items():
+                    b.setChecked(a == alg)
+                QApplication.processEvents()
+
+                self.run_solver(alg)
+                self.worker.wait()
+        
+        self.current_algorithm = None
+        self.uncheck_all_alg_buttons()
+        self.update_maze_view()
+        self.update_controls()
         QMessageBox.information(self, "Concluído", "Todos os algoritmos foram executados.")
 
     def generate_new_mazes(self):
