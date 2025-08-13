@@ -1,7 +1,7 @@
 from PyQt6.QtWidgets import QDialog, QVBoxLayout, QTableWidget, QTableWidgetItem, QHeaderView, QGroupBox, QRadioButton, QHBoxLayout
 from PyQt6.QtCore import Qt
 from enums.algorithms import Algorithm
-#from utils.bd_utils import get_estatisticas
+from utils.bd_utils import get_estatisticas
 
 class ReportDialog(QDialog):
     def __init__(self, db_connection, local_stats, parent=None):
@@ -42,7 +42,7 @@ class ReportDialog(QDialog):
     def fetch_stats(self):
         use_db = self.db_rb.isChecked()
         if use_db and self.db_connection:
-            self.stats = []#get_estatisticas(self.db_connection)
+            self.stats = get_estatisticas(self.db_connection)
         else:
             self.stats = []
             for size_enum, size_stats in self.local_stats.items():

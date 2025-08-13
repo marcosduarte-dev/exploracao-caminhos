@@ -48,6 +48,11 @@ def inserir_estatistica(database, maze, algoritmo, tempo_execucao, celulas_visit
             .execute()
         )
 
+def get_estatisticas(database):
+    if(database):
+        response = database.table("estatisticas").select("*").execute()
+        return response.data
+
 def gerar_id_labirinto(grid):
     maze_str = json.dumps(grid, sort_keys=True)
     return hashlib.md5(maze_str.encode()).hexdigest()
