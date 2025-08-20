@@ -172,8 +172,8 @@ class ReportScreen:
         self.reset_button = None
         
         # Tabelas com scroll
-        self.algorithm_table = ScrollableTable(70, 330, LARGURA_TELA - 140, 140, 20, 6)
-        self.executions_table = ScrollableTable(70, 550, LARGURA_TELA - 140, 120, 20, 5)
+        self.algorithm_table = ScrollableTable(70, 340, LARGURA_TELA - 140, 140, 20, 6)
+        self.executions_table = ScrollableTable(70, 560, LARGURA_TELA - 140, 120, 20, 5)
         
         # Atualizar dados iniciais
         self.atualizar_dados()
@@ -231,11 +231,7 @@ class ReportScreen:
     def limpar_estatisticas(self):
         """Limpa todas as estatísticas do banco de dados ou da memória local."""
         if self.database:
-            if limpar_estatisticas(self.database):
-                self.atualizar_dados()
-                print("Estatísticas limpas com sucesso!")
-            else:
-                print("Erro ao limpar estatísticas!")
+            print("Não é possivel limpar estatísticas do banco de dados diretamente.")
         else:
             # Limpar dados locais
             if self.local_statistics:
@@ -328,7 +324,7 @@ class ReportScreen:
     def draw(self):
         """Desenha a tela de relatórios."""
         # Limpar tela
-        self.screen.fill(WHITE)
+        # self.screen.fill(WHITE)
         
         # Desenhar título
         self._draw_title()
@@ -351,7 +347,7 @@ class ReportScreen:
     def _draw_title(self):
         """Desenha o título da tela de relatórios."""
         title = self.font.render("Relatório de Estatísticas", True, self.text_color)
-        title_rect = title.get_rect(center=(LARGURA_TELA // 2, 30))
+        title_rect = title.get_rect(center=(LARGURA_TELA // 2, 55))
         self.screen.blit(title, title_rect)
         
         # Subtítulo com filtro ativo
@@ -360,13 +356,13 @@ class ReportScreen:
         else:
             subtitle = self.small_font.render("Mostrando todos os tamanhos", True, self.accent_color)
         
-        subtitle_rect = subtitle.get_rect(center=(LARGURA_TELA // 2, 55))
+        subtitle_rect = subtitle.get_rect(center=(LARGURA_TELA // 2, 78))
         self.screen.blit(subtitle, subtitle_rect)
         
         # Indicador de fonte de dados
         fonte_dados = "Banco de Dados" if self.database else "Dados Locais"
         fonte_text = self.tiny_font.render(f"Fonte: {fonte_dados}", True, self.warning_color)
-        fonte_rect = fonte_text.get_rect(topright=(LARGURA_TELA - 20, 10))
+        fonte_rect = fonte_text.get_rect(topright=(LARGURA_TELA - 20, 45))
         self.screen.blit(fonte_text, fonte_rect)
     
     def _draw_filter_buttons(self):
@@ -374,7 +370,7 @@ class ReportScreen:
         button_width = 120
         button_height = 35
         start_x = 50
-        start_y = 80
+        start_y = 95
         spacing = 20
         
         # Botão "Todos"
@@ -412,7 +408,7 @@ class ReportScreen:
         button_width = 100
         button_height = 35
         button_x = LARGURA_TELA - button_width - 50
-        button_y = 80
+        button_y = 95
         
         self.reset_button = pygame.Rect(button_x, button_y, button_width, button_height)
         
@@ -431,18 +427,18 @@ class ReportScreen:
     def _draw_general_stats(self):
         """Desenha as estatísticas gerais."""
         # Container para estatísticas gerais
-        stats_rect = pygame.Rect(50, 130, LARGURA_TELA - 100, 120)
+        stats_rect = pygame.Rect(50, 140, LARGURA_TELA - 100, 130)
         pygame.draw.rect(self.screen, self.sidebar_color, stats_rect, border_radius=10)
         pygame.draw.rect(self.screen, self.border_color, stats_rect, 1, border_radius=10)
         
         # Título da seção
         title = self.font.render("Estatísticas Gerais", True, self.text_color)
-        self.screen.blit(title, (70, 140))
+        self.screen.blit(title, (70, 150))
         
         if self.estatisticas_gerais:
             # Estatísticas
             stats = self.estatisticas_gerais
-            y_offset = 170
+            y_offset = 180
             
             # Primeira linha
             execucoes_text = self.small_font.render(f"Total de execuções: {stats['total_execucoes']}", True, self.text_color)
@@ -468,19 +464,19 @@ class ReportScreen:
     def _draw_algorithm_stats(self):
         """Desenha as estatísticas por algoritmo."""
         # Container para estatísticas por algoritmo
-        stats_rect = pygame.Rect(50, 270, LARGURA_TELA - 100, 200)
+        stats_rect = pygame.Rect(50, 280, LARGURA_TELA - 100, 210)
         pygame.draw.rect(self.screen, self.sidebar_color, stats_rect, border_radius=10)
         pygame.draw.rect(self.screen, self.border_color, stats_rect, 1, border_radius=10)
         
         # Título da seção
         title = self.font.render("Estatísticas por Algoritmo", True, self.text_color)
-        self.screen.blit(title, (70, 280))
+        self.screen.blit(title, (70, 290))
         
         if self.estatisticas_por_algoritmo:
             # Cabeçalho da tabela
-            header_y = 310
+            header_y = 320
             headers = ["Algoritmo", "Execuções", "Tempo Médio", "Células (médio)", "Caminho (médio)", "Memória (média)"]
-            column_widths = [150, 80, 120, 120, 120, 120]
+            column_widths = [200, 80, 120, 120, 120, 120]
             
             for i, header in enumerate(headers):
                 header_text = self.tiny_font.render(header, True, self.text_color)
@@ -541,19 +537,19 @@ class ReportScreen:
     def _draw_recent_executions(self):
         """Desenha a lista de execuções recentes."""
         # Container para execuções recentes
-        stats_rect = pygame.Rect(50, 490, LARGURA_TELA - 100, 180)
+        stats_rect = pygame.Rect(50, 500, LARGURA_TELA - 100, 190)
         pygame.draw.rect(self.screen, self.sidebar_color, stats_rect, border_radius=10)
         pygame.draw.rect(self.screen, self.border_color, stats_rect, 1, border_radius=10)
         
         # Título da seção
         title = self.font.render("Execuções Recentes", True, self.text_color)
-        self.screen.blit(title, (70, 500))
+        self.screen.blit(title, (70, 510))
         
         if self.estatisticas:
             # Cabeçalho da tabela
-            header_y = 530
+            header_y = 540
             headers = ["Tamanho", "Algoritmo", "Tempo", "Células", "Caminho", "Memória"]
-            column_widths = [80, 150, 100, 80, 80, 100]
+            column_widths = [80, 200, 100, 80, 80, 100]
             
             for i, header in enumerate(headers):
                 header_text = self.tiny_font.render(header, True, self.text_color)
