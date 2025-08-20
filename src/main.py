@@ -272,7 +272,7 @@ class Main:
     def run_all_algorithms(self):
         """Executa todos os algoritmos de resolução de labirinto."""
         for algorithm in Algorithm:
-            print(f"Running {algorithm.name}...")
+            print(f"Rodando {algorithm.name}...")
             path, visited, history, time_taken, memory_used = self.solve_algorithm(algorithm)
             
             self.solutions[self.current_tab][algorithm] = path
@@ -297,7 +297,7 @@ class Main:
                     self.start_x + 25, ALTURA_TELA - 30, 400 - 40, 10, 
                     0, len(history) - 1, 0
                 )
-        print("All algorithms finished.")
+        print("Finalizado a execução de todos os algoritmos.")
 
     def run(self):
         """
