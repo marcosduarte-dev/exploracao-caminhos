@@ -61,9 +61,7 @@ class UI:
             sliders (dict): Dicionário com os steppers gerados para cada algoritmo.
         """
         if current_tab == MazeSize.REPORT:
-            # Modo de relatório: limpa a tela e exibe o relatório
-            self.screen.fill(WHITE)
-            print("TELA REPORT")  # TODO: Implementar tela de relatório
+            # Modo de relatório: será tratado no main.py
             return
 
         if maze is None:

@@ -7,6 +7,7 @@ from enums.algorithms import Algorithm
 from utils.maze_utils import generate_mazes
 from utils.bd_utils import open_conection, inserir_estatistica
 from ui.ui import UI
+from ui.report_screen import ReportScreen
 from maze.solvers.bfs_solver import solveBfs
 from maze.solvers.AStartManhattan_solver import solveAstarManhattan
 from maze.solvers.bidirectional_search_solver import solveBidirectionalSearch
@@ -41,6 +42,8 @@ class Main:
 
         # Inicialização de componentes
         self.ui = UI(self.font_path, self.screen)
+        self.database = open_conection()
+        self.report_screen = ReportScreen(self.font_path, self.screen, self.database)
         self.current_tab = MazeSize.SMALL
         self.current_algorithm = None
         self.sprites = self._load_sprites()
@@ -57,7 +60,6 @@ class Main:
 
         self.running = True
 
-        self.database = open_conection()
 
         self.mazes, self.solutions, self.visited_cells, self.statistics, self.visited_history, self.sliders = generate_mazes(self.database)
 
@@ -81,6 +83,10 @@ class Main:
             if event.type == pygame.QUIT:
                 self.running = False  # Fecha o jogo
             elif event.type == pygame.MOUSEBUTTONDOWN:
+                # Se estiver na aba de relatórios, processar eventos da tela de relatórios
+                if self.current_tab == MazeSize.REPORT:
+                    if self.report_screen.handle_events(event):
+                        continue
                 self._handle_mouse_button_down(event)
             elif event.type == pygame.MOUSEBUTTONUP:
                 if event.button == 1:  # Soltar o botão esquerdo
@@ -196,8 +202,11 @@ class Main:
         )
         self.ui.draw_tabs(self.current_tab, self.sprites)
 
-        if self.current_tab.value != 3:  # Se não for a aba de estatísticas
-
+        if self.current_tab == MazeSize.REPORT:
+            # Desenhar tela de relatórios
+            self.report_screen.draw()
+        else:
+            # Desenhar interface normal do labirinto
             self.ui.draw_algorithm_buttons(self.current_algorithm, self.sprites)
             button_width = 50  # Tamanho do botão circular
             x = self.start_x + (650 - button_width) // 2

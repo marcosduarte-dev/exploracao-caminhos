@@ -48,5 +48,7 @@ class MazeSize(Enum):
             name = self.name.replace("MEDIUM", "50x50")
         if(self.name == "LARGE"):
             name = self.name.replace("LARGE", "100x100")
+        if(self.name == "REPORT"):
+            name = self.name.replace("REPORT", "Relatórios")
         
         return name
