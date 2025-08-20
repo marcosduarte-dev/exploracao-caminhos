@@ -43,7 +43,10 @@ class Main:
         # Inicialização de componentes
         self.ui = UI(self.font_path, self.screen)
         self.database = open_conection()
-        self.report_screen = ReportScreen(self.font_path, self.screen, self.database)
+        
+        self.mazes, self.solutions, self.visited_cells, self.statistics, self.visited_history, self.sliders = generate_mazes(self.database)
+        
+        self.report_screen = ReportScreen(self.font_path, self.screen, self.database, self.statistics)
         self.current_tab = MazeSize.SMALL
         self.current_algorithm = None
         self.sprites = self._load_sprites()
@@ -59,9 +62,6 @@ class Main:
         self.is_loading = False
 
         self.running = True
-
-
-        self.mazes, self.solutions, self.visited_cells, self.statistics, self.visited_history, self.sliders = generate_mazes(self.database)
 
     def _load_sprites(self):
         """
@@ -82,21 +82,27 @@ class Main:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 self.running = False  # Fecha o jogo
-            elif event.type == pygame.MOUSEBUTTONDOWN:
-                # Se estiver na aba de relatórios, processar eventos da tela de relatórios
-                if self.current_tab == MazeSize.REPORT:
-                    if self.report_screen.handle_events(event):
-                        continue
+                continue
+
+            # Encaminhar eventos para a tela de relatórios quando a aba REPORT estiver ativa.
+            # Se o relatório consumir o evento (ex.: scroll/drag do scrollbar), não propaga.
+            if self.current_tab == MazeSize.REPORT:
+                handled = self.report_screen.handle_events(event)
+                if handled:
+                    continue
+                # Caso não tenha sido consumido (ex.: clique fora das caixas), deixa seguir para tabs etc.
+
+            if event.type == pygame.MOUSEBUTTONDOWN:
                 self._handle_mouse_button_down(event)
             elif event.type == pygame.MOUSEBUTTONUP:
                 if event.button == 1:  # Soltar o botão esquerdo
                     self.dragging = False
             elif event.type == pygame.MOUSEMOTION:
                 self._handle_mouse_motion(event)
+
             if (hasattr(self, 'sliders') and 
                 self.current_tab in self.sliders and 
                 self.current_algorithm in self.sliders[self.current_tab]):
-                
                 slider = self.sliders[self.current_tab][self.current_algorithm]
                 slider.handle_event(event)
 
@@ -140,6 +146,8 @@ class Main:
                             "path_length": (len(path) - 1),
                             "memory_used": memory_used
                         }
+                        # Atualizar estatísticas locais na tela de relatórios
+                        self.report_screen.atualizar_estatisticas_locais(self.statistics)
                         self.visited_history[self.current_tab][self.current_algorithm] = history
                         if history and self.show_visited:
                             if not hasattr(self, 'sliders'):
@@ -165,6 +173,8 @@ class Main:
                     self.is_loading = True
                     self.update()
                     self.mazes, self.solutions, self.visited_cells, self.statistics, self.visited_history, self.sliders = generate_mazes(self.database)
+                    # Atualizar estatísticas locais na tela de relatórios
+                    self.report_screen.atualizar_estatisticas_locais(self.statistics)
                     self.current_algorithm = None  # limpa seleção anterior
                     self.contagem_generate_maze = 0
                     self.is_loading = False
@@ -273,6 +283,8 @@ class Main:
                 "path_length": (len(path) - 1),
                 "memory_used": memory_used
             }
+            # Atualizar estatísticas locais na tela de relatórios
+            self.report_screen.atualizar_estatisticas_locais(self.statistics)
             self.visited_history[self.current_tab][algorithm] = history
             if history and self.show_visited:
                 if not hasattr(self, 'sliders'):
