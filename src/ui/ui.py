@@ -387,6 +387,9 @@ class UI:
                         (start_x + width//2, start_y + height//2 - plus_size//2),
                         (start_x + width//2, start_y + height//2 + plus_size//2),
                         plus_thickness)
+        
+
+    
 
     def draw_statistics(self, screen, stats, x, y):
         """Desenha as estatísticas do algoritmo"""
@@ -406,8 +409,44 @@ class UI:
         path_text = font.render(f"• Tamanho do caminho: {stats['path_length']}", True, self.text_color)
         memory_text = font.render(f"• Uso de memória: {stats['memory_used']:.2f} MB", True, self.text_color)
 
+
         screen.blit(visited_text, (x, y))
         screen.blit(time_text, (x, y + 25))
         screen.blit(path_text, (x, y + 50))
         screen.blit(memory_text, (x, y + 75))
+
+        """Desenha a legenda com as cores e descrições do labirinto."""
+
+        font = pygame.font.Font(self.font_path, 14)
+        start_x=35
+        start_y=680
+        spacing=10
+        box_size=15
+
+        items = [
+            (GREEN,                "Ponto inicial",          False),  # Verde
+            (WHITE,                "Célula do labirinto",    True),   # Branco com borda
+            ((0, 0, 0),            "Parede do labirinto",    False),  # Preto
+            (LIGHT_CYAN,           "Célula visitada",        False),  # Azul
+            (YELLOW,               "Solução final",          False),  # Amarelo
+            (RED,                  "Ponto final",            False),  # Vermelho
+        ]
+
+        x = start_x
+
+        for color, text, draw_border in items:
+
+            rect = pygame.Rect(x, start_y, box_size, box_size)
+            pygame.draw.rect(screen, color, rect)
+
+            if draw_border:
+                pygame.draw.rect(screen, (0, 0, 0), rect, 2)
+
+            text_surface = font.render(text, True, (0, 0, 0))
+            screen.blit(text_surface, (x + box_size + 5, start_y))
+
+            x += box_size + 5 + text_surface.get_width() + spacing
+    
+
+
 
