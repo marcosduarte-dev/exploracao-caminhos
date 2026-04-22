@@ -61,9 +61,7 @@ class UI:
             sliders (dict): Dicionário com os steppers gerados para cada algoritmo.
         """
         if current_tab == MazeSize.REPORT:
-            # Modo de relatório: limpa a tela e exibe o relatório
-            self.screen.fill(WHITE)
-            print("TELA REPORT")  # TODO: Implementar tela de relatório
+            # Modo de relatório: será tratado no main.py
             return
 
         if maze is None:
@@ -287,6 +285,18 @@ class UI:
                            (rect.left + 5, rect.bottom - 5),
                            (rect.right - 5, rect.top + 5), 2)
 
+    def draw_loading_screen(self):
+        """Desenha uma tela de loading sobre a tela principal."""
+        overlay = pygame.Surface((LARGURA_TELA, ALTURA_TELA), pygame.SRCALPHA)
+        overlay.fill((0, 0, 0, 180))  # Black with 180/255 transparency
+
+        self.screen.blit(overlay, (0, 0))
+
+        font = pygame.font.Font(self.font_path, 50)
+        text = font.render("Carregando...", True, WHITE)
+        text_rect = text.get_rect(center=(LARGURA_TELA / 2, ALTURA_TELA / 2))
+        self.screen.blit(text, text_rect)
+
     def draw_tabs(self, current_tab, sprites):
         """
         Desenha as abas de seleção de tamanho do labirinto.
@@ -323,9 +333,10 @@ class UI:
         button_width = 250
         button_height = 40
         button_x = LARGURA_TELA - 380
+        y_offset = 100
         
         for i, algorithm in enumerate(Algorithm):
-            button = pygame.Rect(button_x, (i * button_height) + 100, button_width, button_height - 10)
+            button = pygame.Rect(button_x, (i * button_height) + y_offset, button_width, button_height - 10)
             
             # Verifica hover
             mouse_pos = pygame.mouse.get_pos()
@@ -349,6 +360,27 @@ class UI:
             self.screen.blit(text, text_rect)
             
             self.algorithm_buttons[algorithm] = button
+
+        # Botão "Run All"
+        run_all_button_y = (len(Algorithm) * button_height) + y_offset + 10 # Add some space
+        run_all_button = pygame.Rect(button_x, run_all_button_y, button_width, button_height - 10)
+        
+        mouse_pos = pygame.mouse.get_pos()
+        is_hovered = run_all_button.collidepoint(mouse_pos)
+
+        run_all_color = (60, 179, 113)  # MediumSeaGreen
+        run_all_hover_color = (46, 139, 87) # SeaGreen
+
+        color = run_all_hover_color if is_hovered else run_all_color
+        
+        pygame.draw.rect(self.screen, color, run_all_button, border_radius=10)
+        pygame.draw.rect(self.screen, self.border_color, run_all_button, 1, border_radius=10)
+        
+        text = self.small_font.render("Rodar Todos", True, WHITE) # White text
+        text_rect = text.get_rect(center=(run_all_button.centerx, run_all_button.centery))
+        self.screen.blit(text, text_rect)
+        
+        self.algorithm_buttons["run_all"] = run_all_button
         
         return self.algorithm_buttons
 

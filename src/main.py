@@ -7,6 +7,7 @@ from enums.algorithms import Algorithm
 from utils.maze_utils import generate_mazes
 from utils.bd_utils import open_conection, inserir_estatistica
 from ui.ui import UI
+from ui.report_screen import ReportScreen
 from maze.solvers.bfs_solver import solveBfs
 from maze.solvers.AStartManhattan_solver import solveAstarManhattan
 from maze.solvers.bidirectional_search_solver import solveBidirectionalSearch
@@ -41,6 +42,11 @@ class Main:
 
         # Inicialização de componentes
         self.ui = UI(self.font_path, self.screen)
+        self.database = open_conection()
+        
+        self.mazes, self.solutions, self.visited_cells, self.statistics, self.visited_history, self.sliders = generate_mazes(self.database)
+        
+        self.report_screen = ReportScreen(self.font_path, self.screen, self.database, self.statistics)
         self.current_tab = MazeSize.SMALL
         self.current_algorithm = None
         self.sprites = self._load_sprites()
@@ -52,12 +58,10 @@ class Main:
         self.step_slider = None
         self.start_x = LARGURA_TELA - 400
         self.ui.show_slider = False  # Estado inicial do slider (desabilitado)
+        self.contagem_generate_maze = 0
+        self.is_loading = False
 
         self.running = True
-
-        self.database = open_conection()
-
-        self.mazes, self.solutions, self.visited_cells, self.statistics, self.visited_history, self.sliders = generate_mazes(self.database)
 
     def _load_sprites(self):
         """
@@ -78,23 +82,32 @@ class Main:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 self.running = False  # Fecha o jogo
-            elif event.type == pygame.MOUSEBUTTONDOWN:
+                continue
+
+            # Encaminhar eventos para a tela de relatórios quando a aba REPORT estiver ativa.
+            # Se o relatório consumir o evento (ex.: scroll/drag do scrollbar), não propaga.
+            if self.current_tab == MazeSize.REPORT:
+                handled = self.report_screen.handle_events(event)
+                if handled:
+                    continue
+                # Caso não tenha sido consumido (ex.: clique fora das caixas), deixa seguir para tabs etc.
+
+            if event.type == pygame.MOUSEBUTTONDOWN:
                 self._handle_mouse_button_down(event)
             elif event.type == pygame.MOUSEBUTTONUP:
                 if event.button == 1:  # Soltar o botão esquerdo
                     self.dragging = False
             elif event.type == pygame.MOUSEMOTION:
                 self._handle_mouse_motion(event)
+
             if (hasattr(self, 'sliders') and 
                 self.current_tab in self.sliders and 
                 self.current_algorithm in self.sliders[self.current_tab]):
-                
                 slider = self.sliders[self.current_tab][self.current_algorithm]
                 slider.handle_event(event)
 
     def _handle_mouse_button_down(self, event):
         """Processa cliques do mouse."""
-        contagem_generate_maze = 0
         if event.button == 1:  # Clique esquerdo
             # Verifica se o clique foi no botão toggle
             if hasattr(self.ui, 'toggle_button_rect') and self.ui.toggle_button_rect.collidepoint(event.pos):
@@ -109,45 +122,62 @@ class Main:
                         self.current_algorithm = None
                     break
             # Verifica se o clique foi em um algoritmo
-            for algorithm, rect in self.ui.algorithm_buttons.items():
+            for algorithm_key, rect in self.ui.algorithm_buttons.items():
                 if rect.collidepoint(event.pos):
-                    path = []
-                    visited = []
-                    history = []
-                    time_taken = 0
-                    memory_used = 0
+                    self.is_loading = True
+                    self.update()
 
-                    path, visited, history, time_taken, memory_used = self.solve_algorithm(algorithm)
+                    if algorithm_key == "run_all":
+                        self.run_all_algorithms()
+                    else:
+                        path = []
+                        visited = []
+                        history = []
+                        time_taken = 0
+                        memory_used = 0
+
+                        path, visited, history, time_taken, memory_used = self.solve_algorithm(algorithm_key)
+                        
+                        self.solutions[self.current_tab][self.current_algorithm] = path
+                        self.visited_cells[self.current_tab][self.current_algorithm] = visited
+                        self.statistics[self.current_tab][self.current_algorithm] = {
+                            "visited_count": len(visited),
+                            "time_taken": time_taken,
+                            "path_length": (len(path) - 1),
+                            "memory_used": memory_used
+                        }
+                        # Atualizar estatísticas locais na tela de relatórios
+                        self.report_screen.atualizar_estatisticas_locais(self.statistics)
+                        self.visited_history[self.current_tab][self.current_algorithm] = history
+                        if history and self.show_visited:
+                            if not hasattr(self, 'sliders'):
+                                self.sliders = {
+                                    MazeSize.SMALL: {},
+                                    MazeSize.MEDIUM: {},
+                                    MazeSize.LARGE: {}
+                                }
+                            self.sliders[self.current_tab][self.current_algorithm] = Slider(
+                                self.start_x + 25, ALTURA_TELA - 30, 400 - 40, 10, 
+                                0, len(history) - 1, 0
+                            )
+
+                        self.statistics[self.current_tab][self.current_algorithm]
                     
-                    self.solutions[self.current_tab][self.current_algorithm] = path
-                    self.visited_cells[self.current_tab][self.current_algorithm] = visited
-                    self.statistics[self.current_tab][self.current_algorithm] = {
-                        "visited_count": len(visited),
-                        "time_taken": time_taken,
-                        "path_length": (len(path) - 1),
-                        "memory_used": memory_used
-                    }
-                    self.visited_history[self.current_tab][self.current_algorithm] = history
-                    if history and self.show_visited:
-                        if not hasattr(self, 'sliders'):
-                            self.sliders = {
-                                MazeSize.SMALL: {},
-                                MazeSize.MEDIUM: {},
-                                MazeSize.LARGE: {}
-                            }
-                        self.sliders[self.current_tab][self.current_algorithm] = Slider(
-                            self.start_x + 25, ALTURA_TELA - 30, 400 - 40, 10, 
-                            0, len(history) - 1, 0
-                        )
+                    self.is_loading = False
+                    break # Sair do loop de botões de algoritmo
 
-                    self.statistics[self.current_tab][self.current_algorithm]
-
-                if hasattr(self.ui, 'generate_button_rect') and self.ui.generate_button_rect.collidepoint(event.pos):
-                    contagem_generate_maze = contagem_generate_maze + 1
-                    if(contagem_generate_maze == 4):
-                        self.mazes, self.solutions, self.visited_cells, self.statistics, self.visited_history, self.sliders = generate_mazes(self.database)
-                        self.current_algorithm = None  # limpa seleção anterior
-                        contagem_generate_maze = 0
+            if hasattr(self.ui, 'generate_button_rect') and self.ui.generate_button_rect.collidepoint(event.pos):
+                #self.contagem_generate_maze = self.contagem_generate_maze + 1
+                self.contagem_generate_maze = 4
+                if(self.contagem_generate_maze == 4):
+                    self.is_loading = True
+                    self.update()
+                    self.mazes, self.solutions, self.visited_cells, self.statistics, self.visited_history, self.sliders = generate_mazes(self.database)
+                    # Atualizar estatísticas locais na tela de relatórios
+                    self.report_screen.atualizar_estatisticas_locais(self.statistics)
+                    self.current_algorithm = None  # limpa seleção anterior
+                    self.contagem_generate_maze = 0
+                    self.is_loading = False
 
             if event.pos[0] < 800:
                 self.dragging = True
@@ -181,19 +211,28 @@ class Main:
             self.visited_history, self.sliders
         )
         self.ui.draw_tabs(self.current_tab, self.sprites)
-        self.ui.draw_algorithm_buttons(self.current_algorithm, self.sprites)
-        button_width = 50  # Tamanho do botão circular
-        x = self.start_x + (650 - button_width) // 2
-        self.ui.draw_generate_button(self.screen, x, 50)  # Y = 50, por exemplo
 
-        # Desenha o check no botão toggle
-        if hasattr(self.ui, 'toggle_button_rect'):
-            self.ui.draw_toggle_check(self.screen, self.ui.toggle_button_rect, self.ui.show_slider)
+        if self.current_tab == MazeSize.REPORT:
+            # Desenhar tela de relatórios
+            self.report_screen.draw()
+        else:
+            # Desenhar interface normal do labirinto
+            self.ui.draw_algorithm_buttons(self.current_algorithm, self.sprites)
+            button_width = 50  # Tamanho do botão circular
+            x = self.start_x + (650 - button_width) // 2
+            self.ui.draw_generate_button(self.screen, x, 50)  # Y = 50, por exemplo
 
-        # Desenhar estatísticas (abaixo dos controles)
-        stats = self.statistics[self.current_tab].get(self.current_algorithm)
-        if stats:
-           self.ui.draw_statistics(self.screen, stats, self.start_x + 20, 450)
+            # Desenha o check no botão toggle
+            if hasattr(self.ui, 'toggle_button_rect'):
+                self.ui.draw_toggle_check(self.screen, self.ui.toggle_button_rect, self.ui.show_slider)
+
+            # Desenhar estatísticas (abaixo dos controles)
+            stats = self.statistics[self.current_tab].get(self.current_algorithm)
+            if stats:
+                self.ui.draw_statistics(self.screen, stats, self.start_x + 20, 450)
+
+            if self.is_loading:
+                self.ui.draw_loading_screen()
 
         pygame.display.flip()
 
@@ -229,6 +268,36 @@ class Main:
             memory_used = self.statistics[self.current_tab][self.current_algorithm]["memory_used"]
 
         return path, visited, history, time_taken, memory_used
+
+    def run_all_algorithms(self):
+        """Executa todos os algoritmos de resolução de labirinto."""
+        for algorithm in Algorithm:
+            print(f"Rodando {algorithm.name}...")
+            path, visited, history, time_taken, memory_used = self.solve_algorithm(algorithm)
+            
+            self.solutions[self.current_tab][algorithm] = path
+            self.visited_cells[self.current_tab][algorithm] = visited
+            self.statistics[self.current_tab][algorithm] = {
+                "visited_count": len(visited),
+                "time_taken": time_taken,
+                "path_length": (len(path) - 1),
+                "memory_used": memory_used
+            }
+            # Atualizar estatísticas locais na tela de relatórios
+            self.report_screen.atualizar_estatisticas_locais(self.statistics)
+            self.visited_history[self.current_tab][algorithm] = history
+            if history and self.show_visited:
+                if not hasattr(self, 'sliders'):
+                    self.sliders = {
+                        MazeSize.SMALL: {},
+                        MazeSize.MEDIUM: {},
+                        MazeSize.LARGE: {}
+                    }
+                self.sliders[self.current_tab][algorithm] = Slider(
+                    self.start_x + 25, ALTURA_TELA - 30, 400 - 40, 10, 
+                    0, len(history) - 1, 0
+                )
+        print("Finalizado a execução de todos os algoritmos.")
 
     def run(self):
         """

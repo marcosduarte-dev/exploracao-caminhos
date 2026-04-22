@@ -1,6 +1,6 @@
 import random
 
-def generate_maze(width, height, wall_removal_prob=0.8):
+def generate_maze(width, height):
     """
     Gera um labirinto usando o algoritmo de Prim com múltiplos caminhos.
     O algoritmo cria um labirinto com paredes removidas aleatoriamente para adicionar loops.
@@ -8,7 +8,6 @@ def generate_maze(width, height, wall_removal_prob=0.8):
     Args:
         width (int): Largura do labirinto (número de colunas).
         height (int): Altura do labirinto (número de linhas).
-        wall_removal_prob (float): Probabilidade de remover uma parede durante a fase de adição de loops.
 
     Returns:
         list: Uma matriz (lista de listas) representando o labirinto, onde:
